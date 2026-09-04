@@ -1,0 +1,70 @@
+name: Commit Reminder
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"  # every Monday 08:00 UTC
+  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab too
+
+jobs:
+  check-commits:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check days since last commit
+        id: check
+        run: |
+          last_epoch=$(git log -1 --format=%ct)
+          now_epoch=$(date +%s)
+          days=$(( (now_epoch - last_epoch) / 86400 ))
+          echo "days=$days" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if an open reminder already exists
+        id: existing
+        if: steps.check.outputs.days >= 7
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              labels: "commit-reminder",
+            });
+            core.setOutput("exists", issues.length > 0 ? "true" : "false");
+
+      - name: Find the student collaborator
+        id: student
+        if: steps.check.outputs.days >= 7 && steps.existing.outputs.exists == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+
+            const staff = ["docunasir", "drunasir444"];
+            const { data: collabs } = await github.rest.repos.listCollaborators({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const student = collabs.find(c => !staff.includes(c.login));
+            core.setOutput("login", student ? student.login : "");
+
+      - name: Open reminder issue
+        if: steps.check.outputs.days >= 7 && steps.existing.outputs.exists == 'false' && steps.student.outputs.login != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const days = ${{ steps.check.outputs.days }};
+            const login = "${{ steps.student.outputs.login }}";
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Reminder: no commits in ${days} days`,
+              body: `Hi @${login} — no commits have been made to this repo in the last ${days} days. Please commit your progress regularly per the course workflow (see README.md).`,
+              assignees: [login],
+              labels: ["commit-reminder"],
+            });
