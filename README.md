@@ -52,25 +52,16 @@ loans, maintenance, faults and equipment-related knowledge. A key objective is t
 - Equipment may be associated with previous projects or project ideas.
 
 **Non-Functional Requirements**
-- Users shall be able to log in and log out.
-- The system shall support Student, Maintainer and Administrator roles.
-- Users shall be able to browse and view registered laboratory equipment.
-- Equipment shall contain relevant information such as type/model, location,
-  availability and condition.
-- Users shall be able to access setup and usage guides for equipment.
-- Users shall be able to access troubleshooting information for equipment.
-- Authorized users shall be able to create and update equipment information
-  and guides.
-- Users shall be able to request borrowable equipment for a specified period.
-- Authorized users shall be able to approve or reject loan requests when
-  approval is required.
-- The system shall keep track of active loans and equipment availability.
-- Authorized users shall be able to register returned equipment.
-- Users shall be able to report equipment faults.
-- Authorized users shall be able to manage faults and update equipment
-  condition.
-- Equipment may provide a QR code linking directly to its information page.
-- Equipment may be associated with previous projects or project ideas.
+- The system shall provide a simple and intuitive graphical user interface.
+- The interface shall be suitable for users with varying levels of technical competence.
+- The application shall be responsive and usable on desktop, tablet and mobile devices.
+- Protected functionality shall require authentication.
+- Access to functionality shall be restricted according to user roles and permissions.
+- Borrower identities shall not be visible to ordinary users.
+- User-provided data shall be validated before being stored or processed.
+- The system should only collect personal information necessary for operating the system.
+- Equipment knowledge shall remain available when maintainers or responsibilities change.
+- The implementation shall use a clear and maintainable structure.
 
 ---
 
