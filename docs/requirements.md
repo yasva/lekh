@@ -1,27 +1,29 @@
 # Lab Equipment Knowledge Hub (LEKH)
+
 ## Requirements Specification
 
 **Customer:** Zeth Danielsson  
 **Course:** PA1493 Software Development Project (Distance) HT26  
 **Status:** Draft  
-**Version:** 0.1  
-**Last updated:** 2026-09-07  
+**Version:** 0.2  
+**Last updated:** 2026-09-11  
 
 ## Document History
 
 | Version | Date | Source | Changes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 0.1 | 2026-09-07 | Project description and Customer Meeting 1 | Initial requirements, proposed MVP, and open questions |
+| 0.2 | 2026-09-11 | Customer Meeting 2 | Updated requirements, priorities, permissions, return workflow, equipment quantity model, guide version history and mobile requirements |
 
 ## Requirement Status
 
 Requirements in this document use the following status values:
 
-- **Confirmed** – supported by information provided by the customer during Customer Meeting 1 or by the original project description.
+- **Confirmed** – supported by information provided by the customer during Customer Meetings 1 or 2 or by the original project description.
 - **Proposed** – an interpretation or proposed solution based on the customer's needs that requires further validation.
 - **Open** – a requirement or detail that requires clarification from the customer.
 
-The priorities in this document represent the current interpretation after Customer Meeting 1. The proposed MVP and priorities will be reviewed with the customer during Customer Meeting 2.
+The priorities in this document have been updated based on Customer Meetings 1 and 2. Equipment Knowledge & Guides has been confirmed as the highest-priority area.
 
 ---
 
@@ -80,7 +82,7 @@ Technical competence should not be assumed to be high. The customer stated that 
 
 **Typical Use**
 
-Find or scan equipment → open equipment page → read guide → check availability → use or request equipment → consult troubleshooting information if necessary.
+Log in → find or scan equipment → open equipment page → read guide → check availability → use or request equipment → consult troubleshooting information if necessary.
 
 ---
 
@@ -101,7 +103,7 @@ Maintainers are expected to have greater technical knowledge than ordinary users
 - Maintain equipment information.
 - Create and update equipment guides.
 - Keep equipment status current.
-- Manage relevant loans and returns.
+- Manage relevant loan requests and loan information.
 - Handle reported faults.
 - Maintain knowledge about known problems.
 - Be responsible for particular equipment where appropriate.
@@ -136,7 +138,7 @@ The initial system is divided into seven main functional areas:
 
 1. Authentication and user roles.
 2. Equipment inventory and discovery.
-3. Equipment knowledge, guides, and troubleshooting.
+3. Equipment knowledge, guides and troubleshooting.
 4. Loans and availability.
 5. Maintenance and fault reporting.
 6. QR-based equipment access.
@@ -149,7 +151,7 @@ The current requirements include:
 - User authentication.
 - Student, Maintainer, and Administrator roles.
 - Equipment inventory.
-- Equipment types and individual physical units where applicable.
+- Equipment types with quantity-based inventory.
 - Equipment location.
 - Equipment availability and condition.
 - Equipment guides.
@@ -165,7 +167,7 @@ The current requirements include:
 - QR codes linked to equipment.
 - Basic printable QR labels.
 - Project examples or ideas associated with equipment.
-- A responsive graphical web interface.
+- A responsive, mobile-compatible graphical user interface.
 
 ### Lower-Priority / Extended Scope
 
@@ -200,6 +202,8 @@ Users shall be able to:
 - Have an identifiable user account.
 - Have sufficient contact information for authorized staff to contact them when necessary.
 
+All application functionality shall require the user to be authenticated.
+
 The exact authentication solution has not yet been determined.
 
 ---
@@ -216,6 +220,8 @@ The system shall support at least the following roles:
 - Administrator
 
 The functionality available to a user shall depend on the user's role and permissions.
+
+A user may have more than one responsibility or role, for example a Student who also acts as a Maintainer.
 
 ---
 
@@ -256,7 +262,6 @@ Relevant equipment information may include:
 
 - Name.
 - Equipment type or model.
-- Individual physical unit where applicable.
 - Location.
 - Availability.
 - Condition/status.
@@ -264,21 +269,16 @@ Relevant equipment information may include:
 
 ---
 
-### FR-6 – Equipment Types and Physical Units
+### FR-6 – Equipment Types and Quantity
 
 **Priority:** Must  
 **Status:** Confirmed
 
-The system shall support distinguishing between an equipment type and individual physical units where this distinction is relevant.
+The system shall represent equipment of the same type using a quantity rather than tracking each physical unit individually.
 
-For example:
+For example, multiple Raspberry Pis of the same type may be represented as one equipment record with an associated quantity.
 
-Raspberry Pi 4B  
-- Unit 001
-- Unit 002
-- Unit 003
-
-Individual units may have different availability or condition.
+Availability shall reflect the quantity of equipment currently available where applicable.
 
 ---
 
@@ -291,26 +291,27 @@ Equipment shall contain information about where it is stored or located.
 
 The customer explained that equipment belonging to the same category is normally kept together.
 
-The exact relationship between locations, shelves, equipment types, and individual units will be determined during system design.
+The exact relationship between locations, shelves, and equipment types will be determined during system design.
 
 ---
 
-### FR-8 – Equipment Status
+### FR-8 – Equipment Availability and Condition
 
 **Priority:** Must  
 **Status:** Confirmed
 
-The system shall represent the availability and/or condition of equipment.
+The system shall represent the availability and condition of equipment.
 
-Possible statuses may include:
+For quantity-based equipment, availability shall reflect how many items are currently available.
 
-- Available
-- On loan
-- Broken
-- In repair
-- Out of service
+Equipment condition/status may include:
 
-The exact set of statuses will be refined during development.
+- Operational.
+- Broken.
+- In repair.
+- Out of service.
+
+The exact representation of availability and condition will be refined during system design.
 
 ---
 
@@ -347,9 +348,9 @@ Search and/or filtering functionality should support equipment discovery.
 
 Equipment shall be able to have an associated guide.
 
-The guide shall provide users with the knowledge required to understand, set up, and/or use the equipment.
+The guide shall provide users with the knowledge required to understand, set up and/or use the equipment.
 
-Equipment guides are the highest-priority requirement identified during Customer Meeting 1.
+Equipment guides are the highest-priority requirement, as identified during Customer Meeting 1 and confirmed during Customer Meeting 2.
 
 ---
 
@@ -401,26 +402,22 @@ The customer leaves the technical storage method to the developer. Resources may
 ### FR-15 – Guide Creation and Editing
 
 **Priority:** Must  
-**Status:** Open
+**Status:** Confirmed
 
-Authorized users shall be able to create and update equipment guides and related knowledge.
+Maintainers and Administrators shall be able to create and update equipment guides and related troubleshooting knowledge.
 
-It has not yet been determined whether knowledge editing should be restricted to Maintainers/Administrators or whether Students should also be able to contribute.
+Students/ordinary users shall be able to view this knowledge but shall not be permitted to create or edit guides or troubleshooting information.
 
 ---
 
 ### FR-16 – Knowledge History
 
-**Priority:** Should  
+**Priority:** Should
 **Status:** Confirmed
 
-Relevant knowledge content should preserve information about authorship and changes.
+When an equipment guide is updated, previous versions shall remain available for viewing.
 
-When responsibility for equipment changes, existing knowledge shall remain available.
-
-The system should retain information about who originally created or changed relevant knowledge.
-
-The required level of version history remains to be clarified.
+The system should preserve relevant authorship and change information so that knowledge remains traceable when guides are updated or responsibility for equipment changes.
 
 ---
 
@@ -496,14 +493,16 @@ This reflects information already maintained in the customer's current manual lo
 
 ### FR-22 – Return Equipment
 
-**Priority:** Must  
+**Priority:** Must
 **Status:** Confirmed
 
-Authorized users shall be able to record that borrowed equipment has been returned.
+A Student/User shall be able to register the return of borrowed equipment.
 
-The system shall update the equipment's availability appropriately.
+As part of the return workflow, the user shall complete a checklist/information step concerning the returned equipment.
 
-Whether equipment must be inspected before becoming available again remains to be clarified.
+After the return is registered, the equipment availability shall be updated appropriately.
+
+A separate Maintainer inspection or pending-inspection state is not required before the equipment can be returned to availability.
 
 ---
 
@@ -594,6 +593,8 @@ Equipment should be able to have a QR code.
 Scanning the QR code shall direct the user to the relevant equipment information page.
 
 The QR code itself shall not be used as an authentication mechanism.
+
+If the user is not already authenticated, authentication shall be required before the equipment information is displayed.
 
 ---
 
@@ -726,18 +727,18 @@ This is important because users and Maintainers may access the system while phys
 
 ---
 
-### NFR-5 – Responsive Web Interface
+### NFR-5 – Responsive and Mobile-Compatible Interface
 
 **Priority:** Must  
 **Status:** Confirmed
 
-The graphical interface shall adapt to different screen sizes, including:
+The user interface shall work effectively across relevant screen sizes, including:
 
 - Desktop.
 - Tablet.
 - Mobile.
 
-A native mobile application is not required.
+The technical solution may be implemented as a responsive web application or another suitable mobile-compatible solution. The customer leaves this technical choice to the development team.
 
 ---
 
@@ -748,7 +749,7 @@ A native mobile application is not required.
 **Priority:** Must  
 **Status:** Confirmed
 
-Protected functionality shall require authentication.
+All application functionality shall require authentication.
 
 The exact authentication mechanism remains to be determined.
 
@@ -812,7 +813,7 @@ A requirement to collect users' physical home addresses has not been established
 **Priority:** Must  
 **Status:** Confirmed
 
-The borrowing system is intended for users within the organization rather than members of the general public.
+The application is intended for users within the organization rather than members of the general public.
 
 ---
 
@@ -834,7 +835,7 @@ Equipment knowledge shall remain available when Maintainers or other responsible
 
 Relevant knowledge should preserve authorship and change information so that it is possible to identify who contributed information.
 
-The exact level of version history remains to be clarified.
+Previous versions of updated equipment guides shall remain accessible for viewing.
 
 ---
 
@@ -851,11 +852,11 @@ The customer has not mandated a specific programming language or framework. The 
 
 # 4. Proposed MVP
 
-The following MVP represents the current interpretation of the customer's priorities based on Customer Meeting 1.
+The following MVP reflects the current interpretation of the customer's priorities following Customer Meetings 1 and 2.
 
-It has not yet been finalized and will be reviewed with the customer during Customer Meeting 2.
+Equipment Knowledge & Guides has been confirmed as the highest-priority area. The customer has emphasized that equipment guides should remain in scope even if the overall project scope must be reduced.
 
-The customer has stated that quality should be prioritized over implementing a large number of features.
+Quality should be prioritized over implementing a large number of features.
 
 ## 4.1 Must
 
@@ -865,6 +866,7 @@ The customer has stated that quality should be prioritized over implementing a l
 - Access setup and usage instructions.
 - Access troubleshooting information.
 - Preserve equipment knowledge over time.
+- Maintainers and Administrators can create and update guides and troubleshooting information.
 
 ### Equipment Inventory
 
@@ -888,7 +890,7 @@ The customer has stated that quality should be prioritized over implementing a l
 - Specify requested borrowing period.
 - Approval where required.
 - Track active loans.
-- Record returned equipment.
+- Allow users to return borrowed equipment through a checklist/information step.
 - Display equipment availability.
 - Protect borrower identity from ordinary users.
 
@@ -946,9 +948,10 @@ The proposed primary MVP journey is:
 4. The Student reads the guide, setup instructions, or troubleshooting information.
 5. The Student checks equipment availability.
 6. If borrowing is required, the Student submits a request for a specified period.
-7. An authorized Maintainer processes the request where approval is required.
-8. The equipment is borrowed and later returned.
-9. The system updates the equipment's availability.
+7. An authorized user processes the request where approval is required.
+8. The equipment is borrowed.
+9. When returning the equipment, the Student completes the return checklist/information step and registers the return.
+10. The system updates the equipment availability without requiring a separate inspection/pending state.
 
 A second core journey is:
 
@@ -960,96 +963,37 @@ A second core journey is:
 
 ---
 
-# 5. Open Questions
+# 5. Customer Meeting 2 Decisions and Remaining Open Questions
 
-The following questions require further clarification before related implementation decisions are finalized.
+This section records decisions confirmed during Customer Meeting 2 and identifies the questions that remain open.
 
-## 5.1 Questions for Customer Meeting 2
+## 5.1 Confirmed Decisions
 
-### Q1 – Validate the Proposed MVP
+- Equipment Knowledge & Guides is the highest-priority area.
+- All application functionality shall require authentication.
+- Guides and troubleshooting information may be created and edited by Maintainers and Administrators, but not ordinary Students.
+- Students may report equipment faults.
+- Students shall complete a checklist/information step when returning borrowed equipment.
+- A separate inspection/pending state is not required after return.
+- The system uses Student/User, Maintainer and Administrator roles.
+- A Student may also have Maintainer responsibilities.
+- Equipment of the same type shall be represented using quantity rather than individual physical units.
+- Previous versions of updated guides shall remain accessible.
+- The system must work effectively on mobile devices; the technical implementation is left to the development team.
 
-The current interpretation identifies five core areas:
+## 5.2 Remaining Open Questions
 
-1. Equipment Inventory & Discovery.
-2. Equipment Knowledge & Guides.
-3. Users, Roles & Permissions.
-4. Loans & Availability.
-5. Maintenance & Fault Reporting.
-
-**Question:** Does this represent the customer's priorities for the core product?
-
----
-
-### Q2 – Knowledge Editing Permissions
-
-**Question:** Who should be allowed to create and edit equipment guides and troubleshooting information?
-
-Possible alternatives include:
-
-- Maintainers and Administrators only.
-- Students may also contribute knowledge.
-
----
-
-### Q3 – Equipment Permissions and Maintainer Assignment
-
-**Question:** Who should be able to assign or change equipment-specific permissions and Maintainers?
-
-Should this be restricted to Administrators, or should Maintainers also have this ability?
-
----
-
-### Q4 – Equipment Usage and Borrowing Model
-
-Different equipment may require different usage rules.
-
-A proposed model distinguishes between:
-
-- Direct-use equipment.
-- Bookable equipment.
-- Equipment requiring a loan request and approval.
-
-**Question:** Does this model reflect the customer's intended equipment workflows, or should a simpler model be used?
-
----
-
-### Q5 – Return and Condition Workflow
-
-**Question:** When equipment is returned, should an authorized Maintainer explicitly confirm its condition before it becomes available again?
-
-Possible workflows include:
-
-`Return → Available`
-
-or:
-
-`Return → Inspection → Available / Broken`
-
----
-
-### Q6 – Guide Version History
-
-**Question:** Should previous versions of equipment guides be viewable and/or restorable, or is it sufficient to record who changed a guide and when?
-
----
-
-### Q7 – Authentication
-
-**Question:** Is local username/email and password authentication sufficient for the prototype, or is integration with an existing university authentication system expected?
-
----
-
-### Q8 – Project Library Priority
-
-**Question:** After the core equipment knowledge functionality, how important is the project/idea library compared with loan and maintenance functionality?
-
-This will help determine whether project knowledge should be included in an implementation sprint or treated as lower-priority functionality.
-
----
+- exact authentication/account creation model;
+- exact modelling of a user who is both Student and Maintainer;
+- exact borrowing model;
+- equipment-specific permission administration;
+- Maintainer assignment/change permissions;
+- project library priority;
+- comment functionality and moderation rules remain unresolved but are deferred because comments are outside the core MVP.
 
 # 6. Current Requirements Summary
 
-The main requirement identified after Customer Meeting 1 is the preservation and accessibility of equipment knowledge.
+The main requirement confirmed through Customer Meetings 1 and 2 is the preservation and accessibility of equipment knowledge.
 
 The current proposed implementation priorities are therefore:
 
@@ -1059,4 +1003,4 @@ The current proposed implementation priorities are therefore:
 4. Support the basic lifecycle of borrowing and returning equipment.
 5. Support fault reporting and equipment condition management.
 
-The scope and priorities will be revised following further customer feedback.
+The requirements and priorities will continue to be refined iteratively as remaining open questions are resolved and further customer feedback is received.

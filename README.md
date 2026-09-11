@@ -12,39 +12,51 @@
 
 ### Project Aim and Objectives
 
-The aim of the Lab Equipment Knowledge Hub (LEKH) is to provide a centralised and accessible source of knowledge about laboratory equipment.
+The aim of the Lab Equipment Knowledge Hub (LEKH) is to provide a centralised 
+and accessible source of knowledge about laboratory equipment.
 
 The system will help students and staff find equipment, access setup guides
-and troubleshooting information, check equipment availability and condition and request equipment for borrowing when applicable.
+and troubleshooting information, check equipment availability and condition,
+and request equipment for borrowing when applicable.
 
 The project also aims to support laboratory staff in managing equipment,
-loans, maintenance, faults and equipment-related knowledge. A key objective is to preserve this knowledge over time so that it remains available even when responsible staff or maintainers change.
+loans, maintenance, faults and equipment-related knowledge. A key objective
+is to preserve this knowledge over time so that it remains available even
+when responsible staff or maintainers change.
 
 ### User Personas
 
 | Name | Characteristics | Needs and Expectations | How will they use the system? |
-|---|---|---|---|
-| Student / Equipment User | Internal user with varying levels of technical experience. | Find equipment, understand how to use it, access guides and troubleshooting information, check availability, request equipment and report problems. | Browses or searches for equipment, opens equipment pages, reads guides, checks availability, requests loans and reports faults. |
-| Maintainer | Lab staff or student assistant responsible for equipment and equipment-related knowledge. Generally has more technical knowledge than an ordinary user. | Maintain equipment information and guides, manage equipment condition, faults, loans and returns. | Updates equipment and guides, handles reported faults, updates equipment status and processes relevant loan requests. |
+| --- | --- | --- | --- |
+| Student / Equipment User | Internal user with varying levels of technical experience. | Find equipment, understand how to use it, access guides and troubleshooting information, check availability, request equipment, return borrowed equipment and report problems. | Logs in, browses or searches for equipment, opens equipment pages, reads guides, checks availability, requests loans, completes the return checklist when returning equipment and reports faults. |
+| Maintainer | Lab staff or student assistant responsible for equipment and equipment-related knowledge. Generally has more technical knowledge than an ordinary user. | Maintain equipment information and guides, manage equipment condition, faults and relevant loan requests. | Updates equipment and guides, handles reported faults, updates equipment status and processes relevant loan requests. |
 | Administrator | User with responsibility for administration and access control. | Manage users, roles, permissions, equipment configuration and maintainer responsibilities. | Manages roles and permissions, assigns maintainers and manages equipment-related access rules. |
 
 ### Software Requirements
 
 **Functional Requirements**
+
 - Users shall be able to log in and log out.
-- The system shall support Student, Maintainer and Administrator roles.
+- The system shall support Student/User, Maintainer and Administrator roles.
+- A user may have more than one responsibility or role.
 - Users shall be able to browse and view registered laboratory equipment.
+- Equipment of the same type shall be represented using quantity rather than
+  tracking individual physical units.
 - Equipment shall contain relevant information such as type/model, location,
   availability and condition.
 - Users shall be able to access setup and usage guides for equipment.
 - Users shall be able to access troubleshooting information for equipment.
-- Authorized users shall be able to create and update equipment information
-  and guides.
+- Authorized users shall be able to create and update equipment information.
+- Maintainers and Administrators shall be able to create and update equipment
+  guides and troubleshooting information.
+- Previous versions of updated equipment guides shall remain available for
+  viewing.
 - Users shall be able to request borrowable equipment for a specified period.
 - Authorized users shall be able to approve or reject loan requests when
   approval is required.
 - The system shall keep track of active loans and equipment availability.
-- Authorized users shall be able to register returned equipment.
+- Students/Users shall be able to complete a return checklist and register
+  borrowed equipment as returned.
 - Users shall be able to report equipment faults.
 - Authorized users shall be able to manage faults and update equipment
   condition.
@@ -52,15 +64,17 @@ loans, maintenance, faults and equipment-related knowledge. A key objective is t
 - Equipment may be associated with previous projects or project ideas.
 
 **Non-Functional Requirements**
+
 - The system shall provide a simple and intuitive graphical user interface.
 - The interface shall be suitable for users with varying levels of technical competence.
 - The application shall be responsive and usable on desktop, tablet and mobile devices.
-- Protected functionality shall require authentication.
+- All application functionality shall require authentication.
 - Access to functionality shall be restricted according to user roles and permissions.
 - Borrower identities shall not be visible to ordinary users.
 - User-provided data shall be validated before being stored or processed.
 - The system should only collect personal information necessary for operating the system.
 - Equipment knowledge shall remain available when maintainers or responsibilities change.
+- Previous versions of updated equipment guides shall remain accessible.
 - The implementation shall use a clear and maintainable structure.
 
 ---
