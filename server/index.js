@@ -63,6 +63,22 @@ app.post("/api/login", async (req, res) => {
   });
 });
 
+app.post("/api/logout", (req, res) => {
+  req.session.destroy((error) => {
+    if (error) {
+      return res.status(500).json({
+        message: "Unable to log out",
+      });
+    }
+
+    res.clearCookie("connect.sid");
+
+    return res.json({
+      message: "Logout successful",
+    });
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`LEKH server running on http://localhost:${PORT}`);
 });
