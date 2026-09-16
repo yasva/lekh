@@ -24,6 +24,16 @@ const testUser = {
   role: "STUDENT",
 };
 
+function requireAuth(req, res, next) {
+  if (!req.session.user) {
+    return res.status(401).json({
+      message: "Authentication required",
+    });
+  }
+
+  next();
+}
+
 app.get("/", (req, res) => {
   res.json({ message: "LEKH API is running" });
 });
@@ -59,6 +69,12 @@ app.post("/api/login", async (req, res) => {
 
   return res.json({
     message: "Login successful",
+    user: req.session.user,
+  });
+});
+
+app.get("/api/session", requireAuth, (req, res) => {
+  return res.json({
     user: req.session.user,
   });
 });
