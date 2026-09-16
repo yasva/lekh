@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { User, Lock, LogIn, LogOut } from "lucide-react";
+import EquipmentDetails from "./components/EquipmentDetails";
 
 function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [user, setUser] = useState(null);
+  const equipment = {
+    name: "3D Printer",
+    typeModel: "Prusa MK4",
+    location: "Lab A - Shelf 2",
+    totalQuantity: 4,
+    availableQuantity: 3,
+    condition: "Available",
+  };
 
   useEffect(() => {
     async function checkSession() {
@@ -92,6 +101,8 @@ function App() {
       {user ? (
         <>
           <p>Welcome, {user.username}!</p>
+
+          <EquipmentDetails equipment={equipment} />
 
           <button type="button" onClick={handleLogout}>
             <LogOut size={18} />
