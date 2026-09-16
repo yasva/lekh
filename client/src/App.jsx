@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { User, Lock, LogIn, LogOut } from "lucide-react";
 
@@ -7,6 +7,28 @@ function App() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const response = await fetch("/api/session", {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          setUser(null);
+          return;
+        }
+
+        const data = await response.json();
+        setUser(data.user);
+      } catch {
+        setUser(null);
+      }
+    }
+
+    checkSession();
+  }, []);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -33,6 +55,7 @@ function App() {
       }
 
       setUser(data.user);
+      setMessage("");
       setUsername("");
       setPassword("");
     } catch {
