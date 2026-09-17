@@ -9,6 +9,7 @@ function App() {
   const [message, setMessage] = useState("");
   const [user, setUser] = useState(null);
   const [equipment, setEquipment] = useState(null);
+  const [equipmentList, setEquipmentList] = useState([]);
 
   useEffect(() => {
     async function checkSession() {
@@ -33,13 +34,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    async function loadEquipment() {
+    async function loadEquipmentList() {
       if (!user) {
         return;
       }
 
       try {
-        const response = await fetch("/api/equipment/1", {
+        const response = await fetch("/api/equipment", {
           credentials: "include",
         });
 
@@ -49,14 +50,33 @@ function App() {
         }
 
         const data = await response.json();
-        setEquipment(data);
+        setEquipmentList(data);
       } catch {
         setMessage("Unable to connect to the server.");
       }
     }
 
-    loadEquipment();
+    loadEquipmentList();
   }, [user]);
+
+  async function handleEquipmentSelect(id) {
+    try {
+      const response = await fetch(`/api/equipment/${id}`, {
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        setMessage("Unable to load equipment details.");
+        return;
+      }
+
+      const data = await response.json();
+      setEquipment(data);
+      setMessage("");
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -120,6 +140,18 @@ function App() {
       {user ? (
         <>
           <p>Welcome, {user.username}!</p>
+
+          <h2>Equipment</h2>
+
+          {equipmentList.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleEquipmentSelect(item.id)}
+            >
+              {item.name}
+            </button>
+          ))}
 
           {equipment && <EquipmentDetails equipment={equipment} />}
 
