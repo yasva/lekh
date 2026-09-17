@@ -87,6 +87,22 @@ app.get("/api/session", requireAuth, (req, res) => {
   });
 });
 
+app.get("/api/equipment", requireAuth, async (req, res) => {
+  try {
+    const equipment = await prisma.equipment.findMany({
+      orderBy: {
+        name: "asc",
+      },
+    });
+
+    return res.json(equipment);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to load equipment",
+    });
+  }
+});
+
 app.get("/api/equipment/:id", requireAuth, async (req, res) => {
   const id = Number(req.params.id);
 
