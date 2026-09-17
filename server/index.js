@@ -3,6 +3,14 @@ require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
+const { PrismaClient } = require("@prisma/client");
+const { PrismaPg } = require("@prisma/adapter-pg");
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const prisma = new PrismaClient({ adapter });
 
 const app = express();
 const PORT = 3000;
@@ -77,6 +85,28 @@ app.get("/api/session", requireAuth, (req, res) => {
   return res.json({
     user: req.session.user,
   });
+});
+
+app.get("/api/equipment/:id", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+
+  try {
+    const equipment = await prisma.equipment.findUnique({
+      where: { id },
+    });
+
+    if (!equipment) {
+      return res.status(404).json({
+        message: "Equipment not found",
+      });
+    }
+
+    return res.json(equipment);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to load equipment",
+    });
+  }
 });
 
 app.post("/api/logout", (req, res) => {

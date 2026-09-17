@@ -8,14 +8,7 @@ function App() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [user, setUser] = useState(null);
-  const equipment = {
-    name: "3D Printer",
-    typeModel: "Prusa MK4",
-    location: "Lab A - Shelf 2",
-    totalQuantity: 4,
-    availableQuantity: 3,
-    condition: "Available",
-  };
+  const [equipment, setEquipment] = useState(null);
 
   useEffect(() => {
     async function checkSession() {
@@ -38,6 +31,32 @@ function App() {
 
     checkSession();
   }, []);
+
+  useEffect(() => {
+    async function loadEquipment() {
+      if (!user) {
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/equipment/1", {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          setMessage("Unable to load equipment.");
+          return;
+        }
+
+        const data = await response.json();
+        setEquipment(data);
+      } catch {
+        setMessage("Unable to connect to the server.");
+      }
+    }
+
+    loadEquipment();
+  }, [user]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -102,7 +121,7 @@ function App() {
         <>
           <p>Welcome, {user.username}!</p>
 
-          <EquipmentDetails equipment={equipment} />
+          {equipment && <EquipmentDetails equipment={equipment} />}
 
           <button type="button" onClick={handleLogout}>
             <LogOut size={18} />
