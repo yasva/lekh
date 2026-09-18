@@ -227,6 +227,57 @@ app.post(
   },
 );
 
+app.put(
+  "/api/equipment/:id/guide",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const equipmentId = Number(req.params.id);
+    const { setup, usage } = req.body;
+
+    if (!setup || !usage) {
+      return res.status(400).json({
+        message: "Setup and usage instructions are required",
+      });
+    }
+
+    try {
+      const existingGuide = await prisma.guide.findFirst({
+        where: {
+          equipmentId,
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+      });
+
+      if (!existingGuide) {
+        return res.status(404).json({
+          message: "Guide not found",
+        });
+      }
+
+      const guide = await prisma.guide.update({
+        where: {
+          id: existingGuide.id,
+        },
+        data: {
+          setup,
+          usage,
+        },
+      });
+
+      return res.json(guide);
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to update equipment guide",
+      });
+    }
+  },
+);
+
 app.post("/api/logout", (req, res) => {
   req.session.destroy((error) => {
     if (error) {

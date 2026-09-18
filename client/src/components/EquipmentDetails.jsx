@@ -1,11 +1,30 @@
 import { useState } from "react";
 
-function EquipmentDetails({ equipment, guide, user, onGuideCreate }) {
+function EquipmentDetails({
+  equipment,
+  guide,
+  user,
+  onGuideCreate,
+  onGuideUpdate,
+}) {
   const [setup, setSetup] = useState("");
   const [usage, setUsage] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   async function handleGuideSubmit(event) {
     event.preventDefault();
+
+    if (isEditing) {
+      const updated = await onGuideUpdate(setup, usage);
+
+      if (updated) {
+        setSetup("");
+        setUsage("");
+        setIsEditing(false);
+      }
+
+      return;
+    }
 
     const created = await onGuideCreate(setup, usage);
 
@@ -49,6 +68,19 @@ function EquipmentDetails({ equipment, guide, user, onGuideCreate }) {
 
             <h4>Usage</h4>
             <p>{guide.usage}</p>
+
+            {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSetup(guide.setup);
+                  setUsage(guide.usage);
+                  setIsEditing(true);
+                }}
+              >
+                Edit guide
+              </button>
+            )}
           </>
         ) : (
           <p>No guide available.</p>
@@ -57,7 +89,9 @@ function EquipmentDetails({ equipment, guide, user, onGuideCreate }) {
 
       {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
         <section>
-          <h3>Create Equipment Guide</h3>
+          <h3>
+            {isEditing ? "Edit Equipment Guide" : "Create Equipment Guide"}
+          </h3>
 
           <form onSubmit={handleGuideSubmit}>
             <label htmlFor="guide-setup">Setup instructions</label>
@@ -76,7 +110,9 @@ function EquipmentDetails({ equipment, guide, user, onGuideCreate }) {
               required
             />
 
-            <button type="submit">Create guide</button>
+            <button type="submit">
+              {isEditing ? "Save changes" : "Create guide"}
+            </button>
           </form>
         </section>
       )}
