@@ -1,4 +1,4 @@
-function EquipmentDetails({ equipment }) {
+function EquipmentDetails({ equipment, guide }) {
   return (
     <section>
       <h2>{equipment.name}</h2>
@@ -26,11 +26,17 @@ function EquipmentDetails({ equipment }) {
       <section>
         <h3>Equipment Guide</h3>
 
-        <h4>Setup</h4>
-        <p>Check that the equipment is connected and ready for use.</p>
+        {guide ? (
+          <>
+            <h4>Setup</h4>
+            <p>{guide.setup}</p>
 
-        <h4>Usage</h4>
-        <p>Follow the equipment instructions before starting your work.</p>
+            <h4>Usage</h4>
+            <p>{guide.usage}</p>
+          </>
+        ) : (
+          <p>No guide available.</p>
+        )}
       </section>
     </section>
   );

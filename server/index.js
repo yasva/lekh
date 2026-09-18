@@ -125,6 +125,34 @@ app.get("/api/equipment/:id", requireAuth, async (req, res) => {
   }
 });
 
+app.get("/api/equipment/:id/guide", requireAuth, async (req, res) => {
+  const equipmentId = Number(req.params.id);
+
+  try {
+    const guide = await prisma.guide.findFirst({
+      where: {
+        equipmentId,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    if (!guide) {
+      return res.status(404).json({
+        message: "Guide not found",
+      });
+    }
+
+    return res.json(guide);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Unable to load equipment guide",
+    });
+  }
+});
+
 app.post("/api/logout", (req, res) => {
   req.session.destroy((error) => {
     if (error) {
