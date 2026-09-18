@@ -25,12 +25,26 @@ app.use(
   }),
 );
 
-const testUser = {
-  id: 1,
-  username: "student",
-  passwordHash: bcrypt.hashSync("password123", 10),
-  role: "STUDENT",
-};
+const testUsers = [
+  {
+    id: 1,
+    username: "student",
+    passwordHash: bcrypt.hashSync("password123", 10),
+    role: "STUDENT",
+  },
+  {
+    id: 2,
+    username: "maintainer",
+    passwordHash: bcrypt.hashSync("password123", 10),
+    role: "MAINTAINER",
+  },
+  {
+    id: 3,
+    username: "admin",
+    passwordHash: bcrypt.hashSync("password123", 10),
+    role: "ADMIN",
+  },
+];
 
 function requireAuth(req, res, next) {
   if (!req.session.user) {
@@ -55,13 +69,15 @@ app.post("/api/login", async (req, res) => {
     });
   }
 
-  if (username !== testUser.username) {
+  const user = testUsers.find((testUser) => testUser.username === username);
+
+  if (!user) {
     return res.status(401).json({
       message: "Invalid username or password",
     });
   }
 
-  const passwordMatches = await bcrypt.compare(password, testUser.passwordHash);
+  const passwordMatches = await bcrypt.compare(password, user.passwordHash);
 
   if (!passwordMatches) {
     return res.status(401).json({
@@ -70,9 +86,9 @@ app.post("/api/login", async (req, res) => {
   }
 
   req.session.user = {
-    id: testUser.id,
-    username: testUser.username,
-    role: testUser.role,
+    id: user.id,
+    username: user.username,
+    role: user.role,
   };
 
   return res.json({
@@ -86,6 +102,18 @@ app.get("/api/session", requireAuth, (req, res) => {
     user: req.session.user,
   });
 });
+
+function requireGuideManager(req, res, next) {
+  const role = req.session.user?.role;
+
+  if (role !== "MAINTAINER" && role !== "ADMIN") {
+    return res.status(403).json({
+      message: "Maintainer or Administrator access required",
+    });
+  }
+
+  next();
+}
 
 app.get("/api/equipment", requireAuth, async (req, res) => {
   try {
@@ -152,6 +180,52 @@ app.get("/api/equipment/:id/guide", requireAuth, async (req, res) => {
     });
   }
 });
+
+app.post(
+  "/api/equipment/:id/guide",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const equipmentId = Number(req.params.id);
+    const { setup, usage } = req.body;
+
+    if (!setup || !usage) {
+      return res.status(400).json({
+        message: "Setup and usage instructions are required",
+      });
+    }
+
+    try {
+      const equipment = await prisma.equipment.findUnique({
+        where: {
+          id: equipmentId,
+        },
+      });
+
+      if (!equipment) {
+        return res.status(404).json({
+          message: "Equipment not found",
+        });
+      }
+
+      const guide = await prisma.guide.create({
+        data: {
+          equipmentId,
+          setup,
+          usage,
+        },
+      });
+
+      return res.status(201).json(guide);
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to create equipment guide",
+      });
+    }
+  },
+);
 
 app.post("/api/logout", (req, res) => {
   req.session.destroy((error) => {
