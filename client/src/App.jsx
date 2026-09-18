@@ -92,6 +92,36 @@ function App() {
     }
   }
 
+  async function handleGuideCreate(setup, usage) {
+    try {
+      const response = await fetch(`/api/equipment/${equipment.id}/guide`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          setup,
+          usage,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return false;
+      }
+
+      setGuide(data);
+      setMessage("Guide created successfully.");
+      return true;
+    } catch {
+      setMessage("Unable to connect to the server.");
+      return false;
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -168,7 +198,12 @@ function App() {
           ))}
 
           {equipment && (
-            <EquipmentDetails equipment={equipment} guide={guide} />
+            <EquipmentDetails
+              equipment={equipment}
+              guide={guide}
+              user={user}
+              onGuideCreate={handleGuideCreate}
+            />
           )}
 
           <button type="button" onClick={handleLogout}>
