@@ -21,4 +21,16 @@ model Equipment {
   condition         String
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  guides            Guide[]
+}
+
+model Guide {
+  id          Int      @id @default(autoincrement())
+  equipmentId Int
+  setup       String
+  usage       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
 }

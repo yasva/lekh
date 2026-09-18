@@ -10,6 +10,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [equipment, setEquipment] = useState(null);
   const [equipmentList, setEquipmentList] = useState([]);
+  const [guide, setGuide] = useState(null);
 
   useEffect(() => {
     async function checkSession() {
@@ -61,17 +62,30 @@ function App() {
 
   async function handleEquipmentSelect(id) {
     try {
-      const response = await fetch(`/api/equipment/${id}`, {
+      const equipmentResponse = await fetch(`/api/equipment/${id}`, {
         credentials: "include",
       });
 
-      if (!response.ok) {
+      if (!equipmentResponse.ok) {
         setMessage("Unable to load equipment details.");
         return;
       }
 
-      const data = await response.json();
-      setEquipment(data);
+      const equipmentData = await equipmentResponse.json();
+      setEquipment(equipmentData);
+
+      const guideResponse = await fetch(`/api/equipment/${id}/guide`, {
+        credentials: "include",
+      });
+
+      if (!guideResponse.ok) {
+        setGuide(null);
+        setMessage("Unable to load equipment guide.");
+        return;
+      }
+
+      const guideData = await guideResponse.json();
+      setGuide(guideData);
       setMessage("");
     } catch {
       setMessage("Unable to connect to the server.");
@@ -153,7 +167,9 @@ function App() {
             </button>
           ))}
 
-          {equipment && <EquipmentDetails equipment={equipment} />}
+          {equipment && (
+            <EquipmentDetails equipment={equipment} guide={guide} />
+          )}
 
           <button type="button" onClick={handleLogout}>
             <LogOut size={18} />
