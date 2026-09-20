@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { User, Lock, LogIn, LogOut } from "lucide-react";
+import { User, Lock, LogIn, LogOut, FlaskConical, Menu, X } from "lucide-react";
 import EquipmentDetails from "./components/EquipmentDetails";
 
 function App() {
@@ -11,6 +11,7 @@ function App() {
   const [equipment, setEquipment] = useState(null);
   const [equipmentList, setEquipmentList] = useState([]);
   const [guide, setGuide] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     async function checkSession() {
@@ -207,82 +208,205 @@ function App() {
     }
   }
 
+  function handleBackToEquipment() {
+    setEquipment(null);
+    setGuide(null);
+    setMessage("");
+  }
+
   return (
-    <main>
-      <h1>LEKH</h1>
-
+    <>
       {user ? (
-        <>
-          <p>Welcome, {user.username}!</p>
+        <div className="app-shell">
+          <header className="app-header">
+            <div className="header-content">
+              <div className="brand">
+                <FlaskConical size={24} />
+                <span>LEKH</span>
+              </div>
 
-          <h2>Equipment</h2>
+              <nav className="desktop-nav" aria-label="Main navigation">
+                <span className="nav-active">Equipment</span>
+              </nav>
 
-          {equipmentList.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => handleEquipmentSelect(item.id)}
-            >
-              {item.name}
-            </button>
-          ))}
+              <div className="user-actions desktop-user-actions">
+                <span className="current-user">{user.username}</span>
 
-          {equipment && (
-            <EquipmentDetails
-              equipment={equipment}
-              guide={guide}
-              user={user}
-              onGuideCreate={handleGuideCreate}
-              onGuideUpdate={handleGuideUpdate}
-            />
-          )}
+                <button
+                  className="logout-button"
+                  type="button"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={18} />
+                  Log out
+                </button>
+              </div>
 
-          <button type="button" onClick={handleLogout}>
-            <LogOut size={18} />
-            Log out
-          </button>
-        </>
+              <button
+                className="menu-button"
+                type="button"
+                aria-label={menuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={menuOpen}
+                onClick={() => setMenuOpen((open) => !open)}
+              >
+                {menuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+
+            {menuOpen && (
+              <div className="mobile-menu">
+                <div className="mobile-menu-content">
+                  <div className="mobile-user">
+                    <span className="mobile-user-label">Signed in as</span>
+                    <strong>{user.username}</strong>
+                  </div>
+
+                  <button
+                    className="mobile-nav-item"
+                    type="button"
+                    onClick={() => {
+                      handleBackToEquipment();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    Equipment
+                  </button>
+
+                  <button
+                    className="mobile-logout"
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      handleLogout();
+                    }}
+                  >
+                    <LogOut size={18} />
+                    Log out
+                  </button>
+                </div>
+              </div>
+            )}
+          </header>
+
+          <main className="app-content">
+            {equipment ? (
+              <>
+                <button
+                  className="back-button"
+                  type="button"
+                  onClick={handleBackToEquipment}
+                >
+                  ← Back to equipment
+                </button>
+
+                <EquipmentDetails
+                  equipment={equipment}
+                  guide={guide}
+                  user={user}
+                  onGuideCreate={handleGuideCreate}
+                  onGuideUpdate={handleGuideUpdate}
+                />
+              </>
+            ) : (
+              <>
+                <h1 className="page-title">Equipment</h1>
+
+                <p className="page-description">
+                  Browse laboratory equipment and access equipment guides.
+                </p>
+
+                <div className="equipment-grid">
+                  {equipmentList.map((item) => (
+                    <button
+                      className="equipment-card"
+                      key={item.id}
+                      type="button"
+                      onClick={() => handleEquipmentSelect(item.id)}
+                    >
+                      <div className="equipment-card-header">
+                        <div>
+                          <h2>{item.name}</h2>
+                          <p>{item.typeModel}</p>
+                        </div>
+
+                        <span className="condition-badge">
+                          {item.condition}
+                        </span>
+                      </div>
+
+                      <div className="equipment-card-info">
+                        <p>
+                          <strong>Location</strong>
+                          <span>{item.location}</span>
+                        </p>
+
+                        <p>
+                          <strong>Availability</strong>
+                          <span>
+                            {item.availableQuantity} of {item.totalQuantity}{" "}
+                            available
+                          </span>
+                        </p>
+                      </div>
+
+                      <span className="equipment-card-link">
+                        View equipment →
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {message && <p>{message}</p>}
+          </main>
+        </div>
       ) : (
-        <>
-          <h2>Login</h2>
+        <main className="login-page">
+          <div className="login-container">
+            <h1>LEKH</h1>
+            <p className="login-subtitle">Lab Equipment Knowledge Hub</p>
 
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="username">
-              <User size={18} />
-              Username
-            </label>
+            <h2>Login</h2>
 
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              required
-            />
+            <form onSubmit={handleSubmit}>
+              <label htmlFor="username">
+                <User size={18} />
+                Username
+              </label>
 
-            <label htmlFor="password">
-              <Lock size={18} />
-              Password
-            </label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                required
+              />
 
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-            />
+              <label htmlFor="password">
+                <Lock size={18} />
+                Password
+              </label>
 
-            <button type="submit">
-              <LogIn size={18} />
-              Log in
-            </button>
-          </form>
-        </>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+
+              <button type="submit">
+                <LogIn size={18} />
+                Log in
+              </button>
+            </form>
+
+            {message && <p>{message}</p>}
+          </div>
+        </main>
       )}
-
-      {message && <p>{message}</p>}
-    </main>
+    </>
   );
 }
 

@@ -1,15 +1,366 @@
-main {
-  width: 100%;
-  max-width: 400px;
-  margin: 4rem auto;
-  padding: 2rem;
+/* ---------- Login ---------- */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4rem 1.5rem;
 }
 
-h1,
-h2 {
+.login-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-container h1,
+.login-container h2 {
   text-align: center;
   color: var(--color-heading);
 }
+
+.login-subtitle {
+  margin-top: -0.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: var(--color-gray-3);
+}
+
+/* ---------- Application ---------- */
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-header {
+  width: 100%;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.header-content {
+  width: 100%;
+  max-width: 1200px;
+  min-height: 64px;
+  margin: 0 auto;
+  padding: 0 2rem;
+
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  color: var(--color-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.nav-active {
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.current-user {
+  color: var(--color-text);
+}
+
+.logout-button {
+  margin: 0;
+  padding: 0.55rem 0.8rem;
+}
+
+/* ---------- Main content ---------- */
+
+.app-content {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.page-title {
+  margin: 0;
+  color: var(--color-heading);
+  text-align: left;
+}
+
+.page-description {
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  color: var(--color-gray-3);
+}
+
+/* ---------- Equipment overview ---------- */
+
+.equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.equipment-card {
+  width: 100%;
+  margin: 0;
+  padding: 1.5rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.25rem;
+
+  text-align: left;
+
+  color: var(--color-text);
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.equipment-card:hover {
+  background: var(--color-surface);
+  border-color: var(--color-accent);
+}
+
+.equipment-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.equipment-card h2 {
+  margin: 0;
+
+  color: var(--color-heading);
+  text-align: left;
+  font-size: 1.25rem;
+}
+
+.equipment-card-header p {
+  margin: 0.3rem 0 0;
+  color: var(--color-gray-3);
+}
+
+.condition-badge {
+  padding: 0.3rem 0.55rem;
+
+  color: var(--color-heading);
+  background: var(--color-gray-5);
+
+  border-radius: 999px;
+
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.equipment-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.equipment-card-info p {
+  margin: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.equipment-card-info strong {
+  color: var(--color-heading);
+  font-size: 0.85rem;
+}
+
+.equipment-card-link {
+  margin-top: auto;
+
+  color: var(--color-accent-hover);
+  font-weight: 600;
+}
+
+/* ---------- Back navigation ---------- */
+
+.back-button {
+  margin: 0 0 2rem;
+  padding: 0;
+
+  justify-content: flex-start;
+
+  color: var(--color-accent-hover);
+  background: transparent;
+
+  font-weight: 600;
+}
+
+.back-button:hover {
+  color: var(--color-white);
+  background: transparent;
+}
+
+/* ---------- Equipment details ---------- */
+
+.equipment-details {
+  width: 100%;
+}
+
+.equipment-details-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+
+  margin-bottom: 2.5rem;
+}
+
+.equipment-details-header h1 {
+  margin: 0;
+
+  color: var(--color-heading);
+  font-size: 2rem;
+}
+
+.equipment-model {
+  margin: 0.35rem 0 0;
+
+  color: var(--color-gray-3);
+  font-size: 1.1rem;
+}
+
+.details-section {
+  margin-top: 2.5rem;
+}
+
+.details-section h2 {
+  margin: 0 0 1rem;
+
+  color: var(--color-heading);
+  text-align: left;
+  font-size: 1.25rem;
+}
+
+/* ---------- Equipment information ---------- */
+
+.information-card,
+.guide-card {
+  padding: 1.5rem;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.information-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 2rem;
+}
+
+.information-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.information-item span {
+  color: var(--color-gray-3);
+  font-size: 0.85rem;
+}
+
+.information-item strong {
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+/* ---------- Equipment guide ---------- */
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  margin-bottom: 1rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+}
+
+.guide-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.guide-section+.guide-section {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.guide-section h3 {
+  margin: 0 0 0.5rem;
+
+  color: var(--color-heading);
+}
+
+.guide-section p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.secondary-button {
+  margin: 0;
+
+  color: var(--color-heading);
+  background: var(--color-gray-5);
+}
+
+.secondary-button:hover {
+  background: var(--color-gray-4);
+}
+
+/* ---------- Guide management ---------- */
+
+.guide-management {
+  margin-bottom: 2rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 0.75rem;
+
+  resize: vertical;
+
+  color: var(--color-heading);
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+
+  font: inherit;
+}
+
+/* ---------- Forms ---------- */
 
 form {
   display: flex;
@@ -21,6 +372,7 @@ label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+
   font-weight: 600;
 }
 
@@ -55,4 +407,129 @@ button {
 
 button:hover {
   background: var(--color-accent-hover);
+}
+
+.scroll-top-button {
+  width: 42px;
+  height: 42px;
+  margin: 2.5rem 0 0 auto;
+  padding: 0;
+
+  border-radius: 999px;
+
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* ---------- Mobile menu ---------- */
+
+.menu-button {
+  display: none;
+  margin: 0;
+  padding: 0.5rem;
+
+  color: var(--color-heading);
+  background: transparent;
+}
+
+.menu-button:hover {
+  background: var(--color-gray-5);
+}
+
+.mobile-menu {
+  display: none;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 700px) {
+  .header-content {
+    min-height: 60px;
+    padding: 0 1rem;
+    gap: 1rem;
+  }
+
+  .desktop-nav,
+  .desktop-user-actions {
+    display: none;
+  }
+
+  .brand {
+    flex: 1;
+  }
+
+  .menu-button {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: block;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .mobile-menu-content {
+    padding: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mobile-user {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+
+    padding: 0.5rem 0 1rem;
+    margin-bottom: 0.5rem;
+
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .mobile-user-label {
+    color: var(--color-gray-3);
+    font-size: 0.8rem;
+  }
+
+  .mobile-user strong {
+    color: var(--color-heading);
+  }
+
+  .mobile-nav-item,
+  .mobile-logout {
+    width: 100%;
+    margin: 0;
+    padding: 0.8rem;
+
+    justify-content: flex-start;
+
+    color: var(--color-heading);
+    background: transparent;
+  }
+
+  .mobile-nav-item:hover,
+  .mobile-logout:hover {
+    background: var(--color-gray-5);
+  }
+
+  .app-content {
+    padding: 2rem 1rem;
+  }
+
+  .equipment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .equipment-details-header {
+    gap: 1rem;
+  }
+
+  .information-card {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+  }
 }
