@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 function EquipmentDetails({
   equipment,
@@ -10,6 +10,8 @@ function EquipmentDetails({
   const [setup, setSetup] = useState("");
   const [usage, setUsage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const editSectionRef = useRef(null);
+  const guideSectionRef = useRef(null);
 
   async function handleGuideSubmit(event) {
     event.preventDefault();
@@ -34,88 +36,162 @@ function EquipmentDetails({
     }
   }
 
+  function handleEditGuide() {
+    setSetup(guide.setup);
+    setUsage(guide.usage);
+    setIsEditing(true);
+
+    setTimeout(() => {
+      editSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
+  }
+
+  function handleCancelEdit() {
+    setSetup("");
+    setUsage("");
+    setIsEditing(false);
+
+    setTimeout(() => {
+      guideSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
+  }
+
   return (
-    <section>
-      <h2>{equipment.name}</h2>
+    <section className="equipment-details">
+      <div className="equipment-details-header">
+        <div>
+          <h1>{equipment.name}</h1>
+          <p className="equipment-model">{equipment.typeModel}</p>
+        </div>
 
-      <p>
-        <strong>Type/Model:</strong> {equipment.typeModel}
-      </p>
+        <span className="condition-badge">{equipment.condition}</span>
+      </div>
 
-      <p>
-        <strong>Location:</strong> {equipment.location}
-      </p>
+      <section className="details-section">
+        <h2>Equipment information</h2>
 
-      <p>
-        <strong>Total quantity:</strong> {equipment.totalQuantity}
-      </p>
+        <div className="information-card">
+          <div className="information-item">
+            <span>Location</span>
+            <strong>{equipment.location}</strong>
+          </div>
 
-      <p>
-        <strong>Available quantity:</strong> {equipment.availableQuantity}
-      </p>
+          <div className="information-item">
+            <span>Availability</span>
+            <strong>
+              {equipment.availableQuantity} of {equipment.totalQuantity}{" "}
+              available
+            </strong>
+          </div>
 
-      <p>
-        <strong>Condition/Status:</strong> {equipment.condition}
-      </p>
+          <div className="information-item">
+            <span>Total quantity</span>
+            <strong>{equipment.totalQuantity}</strong>
+          </div>
 
-      <section>
-        <h3>Equipment Guide</h3>
+          <div className="information-item">
+            <span>Condition</span>
+            <strong>{equipment.condition}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section ref={guideSectionRef} className="details-section">
+        <div className="section-heading">
+          <h2>Equipment Guide</h2>
+
+          {guide && (user.role === "MAINTAINER" || user.role === "ADMIN") && (
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={handleEditGuide}
+            >
+              Edit guide
+            </button>
+          )}
+        </div>
 
         {guide ? (
-          <>
-            <h4>Setup</h4>
-            <p>{guide.setup}</p>
+          <div className="guide-card">
+            <div className="guide-section">
+              <h3>Setup</h3>
+              <p>{guide.setup}</p>
+            </div>
 
-            <h4>Usage</h4>
-            <p>{guide.usage}</p>
-
-            {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSetup(guide.setup);
-                  setUsage(guide.usage);
-                  setIsEditing(true);
-                }}
-              >
-                Edit guide
-              </button>
-            )}
-          </>
+            <div className="guide-section">
+              <h3>Usage</h3>
+              <p>{guide.usage}</p>
+            </div>
+          </div>
         ) : (
-          <p>No guide available.</p>
+          <div className="guide-card">
+            <p>No guide available.</p>
+          </div>
         )}
       </section>
 
-      {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
-        <section>
-          <h3>
-            {isEditing ? "Edit Equipment Guide" : "Create Equipment Guide"}
-          </h3>
+      {(user.role === "MAINTAINER" || user.role === "ADMIN") &&
+        (!guide || isEditing) && (
+          <section
+            ref={editSectionRef}
+            className="details-section guide-management"
+          >
+            <h2>
+              {isEditing ? "Edit Equipment Guide" : "Create Equipment Guide"}
+            </h2>
 
-          <form onSubmit={handleGuideSubmit}>
-            <label htmlFor="guide-setup">Setup instructions</label>
-            <textarea
-              id="guide-setup"
-              value={setup}
-              onChange={(event) => setSetup(event.target.value)}
-              required
-            />
+            <form onSubmit={handleGuideSubmit}>
+              <label htmlFor="guide-setup">Setup instructions</label>
+              <textarea
+                id="guide-setup"
+                value={setup}
+                onChange={(event) => setSetup(event.target.value)}
+                required
+              />
 
-            <label htmlFor="guide-usage">Usage instructions</label>
-            <textarea
-              id="guide-usage"
-              value={usage}
-              onChange={(event) => setUsage(event.target.value)}
-              required
-            />
+              <label htmlFor="guide-usage">Usage instructions</label>
+              <textarea
+                id="guide-usage"
+                value={usage}
+                onChange={(event) => setUsage(event.target.value)}
+                required
+              />
 
-            <button type="submit">
-              {isEditing ? "Save changes" : "Create guide"}
-            </button>
-          </form>
-        </section>
-      )}
+              <button type="submit">
+                {isEditing ? "Save changes" : "Create guide"}
+              </button>
+
+              {isEditing && (
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={handleCancelEdit}
+                >
+                  Cancel
+                </button>
+              )}
+            </form>
+          </section>
+        )}
+      <button
+        className="scroll-top-button"
+        type="button"
+        aria-label="Back to top"
+        onClick={() => {
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }}
+      >
+        ↑
+      </button>
     </section>
   );
 }
