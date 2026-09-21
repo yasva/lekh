@@ -205,7 +205,9 @@ Users shall be able to:
 
 All application functionality shall require the user to be authenticated.
 
-The exact authentication solution has not yet been determined.
+Users shall authenticate using a username and password.
+
+The exact account creation and user provisioning process has not yet been determined.
 
 ---
 
@@ -766,7 +768,7 @@ The technical solution may be implemented as a responsive web application or ano
 
 All application functionality shall require authentication.
 
-The exact authentication mechanism remains to be determined.
+Users shall authenticate using a username and password.
 
 ---
 
@@ -998,7 +1000,7 @@ This section records decisions confirmed during Customer Meeting 2 and identifie
 
 ## 5.2 Remaining Open Questions
 
-- exact authentication and account creation model;
+- exact account creation and user provisioning process;
 - technical representation and user-interface handling of users with multiple roles or responsibilities;
 - detailed borrowing rules for different equipment types;
 - detailed modelling of equipment types and physical units where individual traceability is required;

@@ -28,20 +28,20 @@ when responsible staff or maintainers change.
 
 | Name | Characteristics | Needs and Expectations | How will they use the system? |
 | --- | --- | --- | --- |
-| Student / Equipment User | Internal user with varying levels of technical experience. | Find equipment, understand how to use it, access guides and troubleshooting information, check availability, request equipment, return borrowed equipment and report problems. | Logs in, browses or searches for equipment, opens equipment pages, reads guides, checks availability, requests loans, completes the return checklist when returning equipment and reports faults. |
-| Maintainer | Lab staff or student assistant responsible for equipment and equipment-related knowledge. Generally has more technical knowledge than an ordinary user. | Maintain equipment information and guides, manage equipment condition, faults and relevant loan requests. | Updates equipment and guides, handles reported faults, updates equipment status and processes relevant loan requests. |
-| Administrator | User with responsibility for administration and access control. | Manage users, roles, permissions, equipment configuration and maintainer responsibilities. | Manages roles and permissions, assigns maintainers and manages equipment-related access rules. |
+| Alex – Student | Student / Equipment User. Internal user with varying levels of technical experience. | Find equipment, understand how to use it, access guides and troubleshooting information, check availability, request equipment, return borrowed equipment and report problems. | Logs in, browses or searches for equipment, opens equipment pages, reads guides, checks availability, requests loans, completes the return checklist when returning equipment and reports faults. |
+| Robin – Lab Assistant | Student assistant with Maintainer responsibilities. Generally has more technical knowledge than an ordinary user and may be responsible for particular equipment. | Maintain equipment information and guides, manage equipment condition, faults and relevant loan requests. | Updates equipment and guides, handles reported faults, updates equipment status and processes relevant loan requests. |
+| Sam – Administrator | Administrator with responsibility for administration and access control. | Manage users, roles, permissions, equipment configuration and maintainer responsibilities. | Manages roles and permissions, assigns maintainers and manages equipment-related access rules. |
 
 ### Software Requirements
 
 **Functional Requirements**
 
-- Users shall be able to log in and log out.
+- Users shall be able to log in and log out using a username and password.
 - The system shall support Student/User, Maintainer and Administrator roles.
 - A user may have more than one responsibility or role.
 - Users shall be able to browse and view registered laboratory equipment.
-- Equipment of the same type shall be represented using quantity rather than
-  tracking individual physical units.
+- Equipment of the same type may be presented as a grouped quantity, while
+  individual physical units may be tracked where traceability is required.
 - Equipment shall contain relevant information such as type/model, location,
   availability and condition.
 - Users shall be able to access setup and usage guides for equipment.
