@@ -5,15 +5,16 @@
 **Customer:** Zeth Danielsson  
 **Course:** PA1493 Software Development Project (Distance) HT26  
 **Status:** Draft  
-**Version:** 0.2  
-**Last updated:** 2026-09-11  
+**Version:** 0.3  
+**Last updated:** 2026-09-21
 
 ## Document History
 
-| Version | Date | Source | Changes |
-| --- | --- | --- | --- |
-| 0.1 | 2026-09-07 | Project description and Customer Meeting 1 | Initial requirements, proposed MVP, and open questions |
-| 0.2 | 2026-09-11 | Customer Meeting 2 | Updated requirements, priorities, permissions, return workflow, equipment quantity model, guide version history and mobile requirements |
+| Version | Date       | Source                                            | Changes                                                                                                                                        |
+| ------- | ---------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.1     | 2026-09-07 | Project description and Customer Meeting 1        | Initial requirements, proposed MVP and open questions                                                                                          |
+| 0.2     | 2026-09-11 | Customer Meeting 2                                | Updated requirements, priorities, permissions, return workflow, equipment quantity model, guide version history and mobile requirements        |
+| 0.3     | 2026-09-21 | Customer Meeting 2 review and Sprint 1 refinement | Clarified equipment type vs physical unit modelling, multi-role responsibilities, knowledge/troubleshooting scope and remaining open questions |
 
 ## Requirement Status
 
@@ -31,13 +32,13 @@ The priorities in this document have been updated based on Customer Meetings 1 a
 
 ## 1.1 Purpose
 
-The purpose of the **Lab Equipment Knowledge Hub (LEKH)** is to provide a central system for storing, preserving, and accessing knowledge about laboratory equipment.
+The purpose of the **Lab Equipment Knowledge Hub (LEKH)** is to provide a central system for storing, preserving and accessing knowledge about laboratory equipment.
 
-The main problem identified by the customer is that knowledge about equipment is currently difficult to access and is not maintained in one central place. Users should be able to find information about equipment, understand how to set it up and use it, and find solutions to common problems.
+The main problem identified by the customer is that knowledge about equipment is currently difficult to access and is not maintained in one central place. Users should be able to find information about equipment, understand how to set it up and use it and find solutions to common problems.
 
 Equipment guides are considered the most important part of the system. When asked which functionality should not be removed if the scope had to be reduced, the customer identified **equipment guides** as the essential functionality.
 
-The system should also support workflows surrounding the equipment, including inventory, availability, borrowing, maintenance, fault reporting, and user permissions.
+The system should also support workflows surrounding the equipment, including inventory, availability, borrowing, maintenance, fault reporting and user permissions.
 
 ### Main Goals
 
@@ -149,9 +150,9 @@ The initial system is divided into seven main functional areas:
 The current requirements include:
 
 - User authentication.
-- Student, Maintainer, and Administrator roles.
+- Student, Maintainer and Administrator roles.
 - Equipment inventory.
-- Equipment types with quantity-based inventory.
+- Equipment types with grouped quantities and individual unit tracking where required.
 - Equipment location.
 - Equipment availability and condition.
 - Equipment guides.
@@ -221,7 +222,14 @@ The system shall support at least the following roles:
 
 The functionality available to a user shall depend on the user's role and permissions.
 
-A user may have more than one responsibility or role, for example a Student who also acts as a Maintainer.
+A user may hold more than one role or responsibility. For example,
+a Student may also have Maintainer responsibilities.
+
+The interface may distinguish between the user's current role context
+where this is useful for presenting role-specific functionality.
+
+The exact technical representation of multiple roles is a system
+design decision.
 
 ---
 
@@ -269,16 +277,23 @@ Relevant equipment information may include:
 
 ---
 
-### FR-6 – Equipment Types and Quantity
+### FR-6 – Equipment Types and Physical Units
 
 **Priority:** Must  
 **Status:** Confirmed
 
-The system shall represent equipment of the same type using a quantity rather than tracking each physical unit individually.
+The system shall distinguish between an equipment type and, where
+necessary, its individual physical units.
 
-For example, multiple Raspberry Pis of the same type may be represented as one equipment record with an associated quantity.
+Equipment of the same type may be presented to ordinary users as a
+group with a total and available quantity.
 
-Availability shall reflect the quantity of equipment currently available where applicable.
+Where individual traceability is required, physical units should be
+identifiable separately so that information such as loans, faults,
+condition, serial numbers or asset identifiers can be associated with
+the relevant unit.
+
+Not all equipment types necessarily require individual unit tracking.
 
 ---
 
@@ -291,7 +306,7 @@ Equipment shall contain information about where it is stored or located.
 
 The customer explained that equipment belonging to the same category is normally kept together.
 
-The exact relationship between locations, shelves, and equipment types will be determined during system design.
+The exact relationship between locations, shelves and equipment types will be determined during system design.
 
 ---
 
@@ -412,7 +427,7 @@ Students/ordinary users shall be able to view this knowledge but shall not be pe
 
 ### FR-16 – Knowledge History
 
-**Priority:** Should
+**Priority:** Should  
 **Status:** Confirmed
 
 When an equipment guide is updated, previous versions shall remain available for viewing.
@@ -493,7 +508,7 @@ This reflects information already maintained in the customer's current manual lo
 
 ### FR-22 – Return Equipment
 
-**Priority:** Must
+**Priority:** Must  
 **Status:** Confirmed
 
 A Student/User shall be able to register the return of borrowed equipment.
@@ -914,8 +929,8 @@ The following functionality should be considered after the core product is stabl
 - Transfer/change of Maintainer.
 - Training/induction-based permissions.
 - Project examples associated with equipment.
-- Relevant OS images, firmware, configuration files, and other resources.
-- Different usage policies for direct-use, bookable, and approval-required equipment.
+- Relevant OS images, firmware, configuration files and other resources.
+- Different usage policies for direct-use, bookable and approval-required equipment.
 - More detailed maintenance history.
 
 ---
@@ -977,19 +992,20 @@ This section records decisions confirmed during Customer Meeting 2 and identifie
 - A separate inspection/pending state is not required after return.
 - The system uses Student/User, Maintainer and Administrator roles.
 - A Student may also have Maintainer responsibilities.
-- Equipment of the same type shall be represented using quantity rather than individual physical units.
+- Equipment of the same type may be presented to ordinary users as a grouped quantity, while individual physical units may be tracked separately where traceability is required.
 - Previous versions of updated guides shall remain accessible.
 - The system must work effectively on mobile devices; the technical implementation is left to the development team.
 
 ## 5.2 Remaining Open Questions
 
-- exact authentication/account creation model;
-- exact modelling of a user who is both Student and Maintainer;
-- exact borrowing model;
+- exact authentication and account creation model;
+- technical representation and user-interface handling of users with multiple roles or responsibilities;
+- detailed borrowing rules for different equipment types;
+- detailed modelling of equipment types and physical units where individual traceability is required;
 - equipment-specific permission administration;
 - Maintainer assignment/change permissions;
 - project library priority;
-- comment functionality and moderation rules remain unresolved but are deferred because comments are outside the core MVP.
+- comment functionality and moderation rules remain deferred because comments are outside the core MVP.
 
 # 6. Current Requirements Summary
 
@@ -999,7 +1015,7 @@ The current proposed implementation priorities are therefore:
 
 1. Establish equipment records and equipment pages.
 2. Make guides and troubleshooting knowledge accessible.
-3. Establish users, authentication, and appropriate permissions.
+3. Establish users, authentication and appropriate permissions.
 4. Support the basic lifecycle of borrowing and returning equipment.
 5. Support fault reporting and equipment condition management.
 
