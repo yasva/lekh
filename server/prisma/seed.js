@@ -59,12 +59,6 @@ const equipmentData = [
     totalQuantity: 3,
     availableQuantity: 2,
     condition: "Available",
-    guide: {
-      setup:
-        "Connect the logic analyzer to the computer and attach the required signal channels and ground connection.",
-      usage:
-        "Use the logic analyzer software to capture and inspect digital signals and supported communication protocols.",
-    },
   },
 ];
 
@@ -90,12 +84,14 @@ async function main() {
         totalQuantity: item.totalQuantity,
         availableQuantity: item.availableQuantity,
         condition: item.condition,
-        guides: {
-          create: {
-            setup: item.guide.setup,
-            usage: item.guide.usage,
+        ...(item.guide && {
+          guides: {
+            create: {
+              setup: item.guide.setup,
+              usage: item.guide.usage,
+            },
           },
-        },
+        }),
       },
     });
 
