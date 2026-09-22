@@ -79,6 +79,13 @@ function App() {
         credentials: "include",
       });
 
+      if (guideResponse.status === 404) {
+        setGuide(null);
+        setMessage("");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
       if (!guideResponse.ok) {
         setGuide(null);
         setMessage("Unable to load equipment guide.");
@@ -88,6 +95,7 @@ function App() {
       const guideData = await guideResponse.json();
       setGuide(guideData);
       setMessage("");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setMessage("Unable to connect to the server.");
     }
@@ -202,7 +210,10 @@ function App() {
       }
 
       setUser(null);
+      setEquipment(null);
+      setGuide(null);
       setMessage("You have been logged out.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setMessage("Unable to connect to the server.");
     }
