@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { User, Lock, LogIn, LogOut, FlaskConical, Menu, X } from "lucide-react";
 import EquipmentDetails from "./components/EquipmentDetails";
+import EquipmentForm from "./components/EquipmentForm";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -12,6 +13,7 @@ function App() {
   const [equipmentList, setEquipmentList] = useState([]);
   const [guide, setGuide] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showEquipmentForm, setShowEquipmentForm] = useState(false);
 
   useEffect(() => {
     async function checkSession() {
@@ -98,6 +100,36 @@ function App() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setMessage("Unable to connect to the server.");
+    }
+  }
+
+  async function handleEquipmentCreate(equipmentData) {
+    try {
+      const response = await fetch("/api/equipment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(equipmentData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return false;
+      }
+
+      setEquipmentList((currentList) =>
+        [...currentList, data].sort((a, b) => a.name.localeCompare(b.name)),
+      );
+
+      setMessage("Equipment created successfully.");
+      return true;
+    } catch {
+      setMessage("Unable to connect to the server.");
+      return false;
     }
   }
 
@@ -320,11 +352,29 @@ function App() {
               </>
             ) : (
               <>
-                <h1 className="page-title">Equipment</h1>
+                <div className="section-heading">
+                  <h1 className="page-title">Equipment</h1>
+
+                  {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
+                    <button
+                      type="button"
+                      onClick={() => setShowEquipmentForm(true)}
+                    >
+                      Add equipment
+                    </button>
+                  )}
+                </div>
 
                 <p className="page-description">
                   Browse laboratory equipment and access equipment guides.
                 </p>
+
+                {showEquipmentForm && (
+                  <EquipmentForm
+                    onCreate={handleEquipmentCreate}
+                    onCancel={() => setShowEquipmentForm(false)}
+                  />
+                )}
 
                 <div className="equipment-grid">
                   {equipmentList.map((item) => (
