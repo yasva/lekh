@@ -131,6 +131,51 @@ app.get("/api/equipment", requireAuth, async (req, res) => {
   }
 });
 
+app.post(
+  "/api/equipment",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const { name, typeModel, totalQuantity, location, condition } = req.body;
+
+    const quantity = Number(totalQuantity);
+
+    if (
+      !name?.trim() ||
+      !typeModel?.trim() ||
+      !location?.trim() ||
+      !condition?.trim() ||
+      !Number.isInteger(quantity) ||
+      quantity < 1
+    ) {
+      return res.status(400).json({
+        message: "Valid equipment information is required",
+      });
+    }
+
+    try {
+      const equipment = await prisma.equipment.create({
+        data: {
+          name: name.trim(),
+          typeModel: typeModel.trim(),
+          location: location.trim(),
+          totalQuantity: quantity,
+          availableQuantity: quantity,
+          condition: condition.trim(),
+        },
+      });
+
+      return res.status(201).json(equipment);
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to create equipment",
+      });
+    }
+  },
+);
+
 app.get("/api/equipment/:id", requireAuth, async (req, res) => {
   const id = Number(req.params.id);
 
