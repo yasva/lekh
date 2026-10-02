@@ -518,10 +518,41 @@ app.put(
 app.post("/api/loans", requireAuth, async (req, res) => {
   const { equipmentId, startDate, endDate } = req.body;
 
+  const parsedEquipmentId = Number(equipmentId);
+  const parsedStartDate = new Date(startDate);
+  const parsedEndDate = new Date(endDate);
+
+  if (
+    !Number.isInteger(parsedEquipmentId) ||
+    !startDate ||
+    !endDate ||
+    Number.isNaN(parsedStartDate.getTime()) ||
+    Number.isNaN(parsedEndDate.getTime())
+  ) {
+    return res.status(400).json({
+      message: "Valid equipment and borrowing period are required",
+    });
+  }
+
+  if (parsedEndDate <= parsedStartDate) {
+    return res.status(400).json({
+      message: "End date must be after start date",
+    });
+  }
+
+  const borrowingPeriodMs = parsedEndDate - parsedStartDate;
+  const maximumBorrowingPeriodMs = 56 * 24 * 60 * 60 * 1000;
+
+  if (borrowingPeriodMs > maximumBorrowingPeriodMs) {
+    return res.status(400).json({
+      message: "Borrowing period cannot exceed 8 weeks",
+    });
+  }
+
   try {
     const equipment = await prisma.equipment.findUnique({
       where: {
-        id: Number(equipmentId),
+        id: parsedEquipmentId,
       },
     });
 
@@ -543,8 +574,8 @@ app.post("/api/loans", requireAuth, async (req, res) => {
       data: {
         equipmentId: equipment.id,
         borrowerId: req.session.user.id,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
+        startDate: parsedStartDate,
+        endDate: parsedEndDate,
         approvalStatus: approvalRequired ? "PENDING" : "NOT_REQUIRED",
         loanStatus: approvalRequired ? "REQUESTED" : "ACTIVE",
       },
