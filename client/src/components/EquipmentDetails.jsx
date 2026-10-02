@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 function EquipmentDetails({
   equipment,
   guide,
+  troubleshooting,
   user,
   onGuideCreate,
   onGuideUpdate,
@@ -132,6 +133,27 @@ function EquipmentDetails({
         ) : (
           <div className="guide-card">
             <p>No guide available.</p>
+          </div>
+        )}
+      </section>
+
+      <section className="details-section">
+        <h2>Troubleshooting</h2>
+
+        {troubleshooting.length > 0 ? (
+          <div className="guide-card">
+            {troubleshooting.map((item) => (
+              <div className="guide-section" key={item.id}>
+                <h3>{item.problem}</h3>
+                <p>
+                  <strong>Possible solution:</strong> {item.solution}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="guide-card">
+            <p>No troubleshooting information available.</p>
           </div>
         )}
       </section>
