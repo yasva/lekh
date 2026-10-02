@@ -5,6 +5,7 @@ function EquipmentDetails({
   guide,
   troubleshooting,
   user,
+  onLoanRequest,
   onGuideCreate,
   onGuideUpdate,
   onTroubleshootingCreate,
@@ -19,6 +20,19 @@ function EquipmentDetails({
   const [isEditing, setIsEditing] = useState(false);
   const editSectionRef = useRef(null);
   const guideSectionRef = useRef(null);
+  const [loanStartDate, setLoanStartDate] = useState("");
+  const [loanEndDate, setLoanEndDate] = useState("");
+
+  async function handleLoanSubmit(event) {
+    event.preventDefault();
+
+    const submitted = await onLoanRequest(loanStartDate, loanEndDate);
+
+    if (submitted) {
+      setLoanStartDate("");
+      setLoanEndDate("");
+    }
+  }
 
   async function handleGuideSubmit(event) {
     event.preventDefault();
@@ -141,6 +155,32 @@ function EquipmentDetails({
             <strong>{equipment.condition}</strong>
           </div>
         </div>
+      </section>
+
+      <section className="details-section">
+        <h2>Request equipment</h2>
+
+        <form onSubmit={handleLoanSubmit}>
+          <label htmlFor="loan-start-date">Start date</label>
+          <input
+            id="loan-start-date"
+            type="date"
+            value={loanStartDate}
+            onChange={(event) => setLoanStartDate(event.target.value)}
+            required
+          />
+
+          <label htmlFor="loan-end-date">End date</label>
+          <input
+            id="loan-end-date"
+            type="date"
+            value={loanEndDate}
+            onChange={(event) => setLoanEndDate(event.target.value)}
+            required
+          />
+
+          <button type="submit">Request loan</button>
+        </form>
       </section>
 
       <section ref={guideSectionRef} className="details-section">

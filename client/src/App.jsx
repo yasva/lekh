@@ -181,6 +181,36 @@ function App() {
     }
   }
 
+  async function handleLoanRequest(startDate, endDate) {
+    try {
+      const response = await fetch("/api/loans", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          equipmentId: equipment.id,
+          startDate,
+          endDate,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return false;
+      }
+
+      setMessage("Loan request submitted successfully.");
+      return true;
+    } catch {
+      setMessage("Unable to connect to the server.");
+      return false;
+    }
+  }
+
   async function handleGuideCreate(setup, usage) {
     try {
       const response = await fetch(`/api/equipment/${equipment.id}/guide`, {
@@ -491,6 +521,7 @@ function App() {
                     guide={guide}
                     troubleshooting={troubleshooting}
                     user={user}
+                    onLoanRequest={handleLoanRequest}
                     onGuideCreate={handleGuideCreate}
                     onGuideUpdate={handleGuideUpdate}
                     onTroubleshootingCreate={handleTroubleshootingCreate}
