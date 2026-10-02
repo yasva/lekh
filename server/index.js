@@ -176,6 +176,79 @@ app.post(
   },
 );
 
+app.put(
+  "/api/equipment/:id",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const id = Number(req.params.id);
+    const { name, typeModel, totalQuantity, location, condition } = req.body;
+
+    const quantity = Number(totalQuantity);
+
+    if (!Number.isInteger(id) || id < 1) {
+      return res.status(400).json({
+        message: "Valid equipment ID is required",
+      });
+    }
+
+    if (
+      !name?.trim() ||
+      !typeModel?.trim() ||
+      !location?.trim() ||
+      !condition?.trim() ||
+      !Number.isInteger(quantity) ||
+      quantity < 1
+    ) {
+      return res.status(400).json({
+        message: "Valid equipment information is required",
+      });
+    }
+
+    try {
+      const existingEquipment = await prisma.equipment.findUnique({
+        where: { id },
+      });
+
+      if (!existingEquipment) {
+        return res.status(404).json({
+          message: "Equipment not found",
+        });
+      }
+
+      const unavailableQuantity =
+        existingEquipment.totalQuantity - existingEquipment.availableQuantity;
+
+      if (quantity < unavailableQuantity) {
+        return res.status(400).json({
+          message:
+            "Total quantity cannot be lower than the number of unavailable items",
+        });
+      }
+
+      const equipment = await prisma.equipment.update({
+        where: { id },
+        data: {
+          name: name.trim(),
+          typeModel: typeModel.trim(),
+          location: location.trim(),
+          totalQuantity: quantity,
+          availableQuantity: quantity - unavailableQuantity,
+          condition: condition.trim(),
+        },
+      });
+
+      return res.json(equipment);
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to update equipment",
+      });
+    }
+  },
+);
+
 app.get("/api/equipment/:id", requireAuth, async (req, res) => {
   const id = Number(req.params.id);
 
