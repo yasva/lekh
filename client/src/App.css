@@ -421,6 +421,23 @@ button:hover {
   font-weight: 700;
 }
 
+.equipment-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.equipment-navigation .back-button,
+.equipment-navigation .edit-equipment-button {
+  margin: 0;
+}
+
+.edit-equipment-button {
+  width: auto;
+}
+
 /* ---------- Mobile menu ---------- */
 
 .menu-button {

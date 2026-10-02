@@ -1,16 +1,26 @@
 import { useState } from "react";
 
-function EquipmentForm({ onCreate, onCancel }) {
-  const [name, setName] = useState("");
-  const [typeModel, setTypeModel] = useState("");
-  const [totalQuantity, setTotalQuantity] = useState(1);
-  const [location, setLocation] = useState("");
-  const [condition, setCondition] = useState("Available");
+function EquipmentForm({
+  initialEquipment = null,
+  onSubmit,
+  onCancel,
+  title = "Add equipment",
+  submitLabel = "Add equipment",
+}) {
+  const [name, setName] = useState(initialEquipment?.name ?? "");
+  const [typeModel, setTypeModel] = useState(initialEquipment?.typeModel ?? "");
+  const [totalQuantity, setTotalQuantity] = useState(
+    initialEquipment?.totalQuantity ?? 1,
+  );
+  const [location, setLocation] = useState(initialEquipment?.location ?? "");
+  const [condition, setCondition] = useState(
+    initialEquipment?.condition ?? "Available",
+  );
 
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const created = await onCreate({
+    const saved = await onSubmit({
       name,
       typeModel,
       totalQuantity: Number(totalQuantity),
@@ -18,14 +28,14 @@ function EquipmentForm({ onCreate, onCancel }) {
       condition,
     });
 
-    if (created) {
+    if (saved) {
       onCancel();
     }
   }
 
   return (
     <section className="details-section equipment-form-section">
-      <h2>Add equipment</h2>
+      <h2>{title}</h2>
 
       <form onSubmit={handleSubmit}>
         <label htmlFor="equipment-name">Name</label>
@@ -74,13 +84,9 @@ function EquipmentForm({ onCreate, onCancel }) {
           required
         />
 
-        <button type="submit">Add equipment</button>
+        <button type="submit">{submitLabel}</button>
 
-        <button
-          className="secondary-button"
-          type="button"
-          onClick={onCancel}
-        >
+        <button className="secondary-button" type="button" onClick={onCancel}>
           Cancel
         </button>
       </form>

@@ -14,6 +14,7 @@ function App() {
   const [guide, setGuide] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showEquipmentForm, setShowEquipmentForm] = useState(false);
+  const [showEditEquipmentForm, setShowEditEquipmentForm] = useState(false);
 
   useEffect(() => {
     async function checkSession() {
@@ -126,6 +127,40 @@ function App() {
       );
 
       setMessage("Equipment created successfully.");
+      return true;
+    } catch {
+      setMessage("Unable to connect to the server.");
+      return false;
+    }
+  }
+
+  async function handleEquipmentUpdate(equipmentData) {
+    try {
+      const response = await fetch(`/api/equipment/${equipment.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(equipmentData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return false;
+      }
+
+      setEquipment(data);
+
+      setEquipmentList((currentList) =>
+        currentList
+          .map((item) => (item.id === data.id ? data : item))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      );
+
+      setMessage("Equipment updated successfully.");
       return true;
     } catch {
       setMessage("Unable to connect to the server.");
@@ -254,6 +289,7 @@ function App() {
   function handleBackToEquipment() {
     setEquipment(null);
     setGuide(null);
+    setShowEditEquipmentForm(false);
     setMessage("");
   }
 
@@ -334,21 +370,44 @@ function App() {
           <main className="app-content">
             {equipment ? (
               <>
-                <button
-                  className="back-button"
-                  type="button"
-                  onClick={handleBackToEquipment}
-                >
-                  ← Back to equipment
-                </button>
+                <div className="equipment-navigation">
+                  <button
+                    className="back-button"
+                    type="button"
+                    onClick={handleBackToEquipment}
+                  >
+                    ← Back to equipment
+                  </button>
 
-                <EquipmentDetails
-                  equipment={equipment}
-                  guide={guide}
-                  user={user}
-                  onGuideCreate={handleGuideCreate}
-                  onGuideUpdate={handleGuideUpdate}
-                />
+                  {!showEditEquipmentForm &&
+                    (user.role === "MAINTAINER" || user.role === "ADMIN") && (
+                      <button
+                        className="edit-equipment-button"
+                        type="button"
+                        onClick={() => setShowEditEquipmentForm(true)}
+                      >
+                        Edit equipment
+                      </button>
+                    )}
+                </div>
+
+                {showEditEquipmentForm ? (
+                  <EquipmentForm
+                    initialEquipment={equipment}
+                    onSubmit={handleEquipmentUpdate}
+                    onCancel={() => setShowEditEquipmentForm(false)}
+                    title="Edit equipment"
+                    submitLabel="Save changes"
+                  />
+                ) : (
+                  <EquipmentDetails
+                    equipment={equipment}
+                    guide={guide}
+                    user={user}
+                    onGuideCreate={handleGuideCreate}
+                    onGuideUpdate={handleGuideUpdate}
+                  />
+                )}
               </>
             ) : (
               <>
@@ -371,7 +430,7 @@ function App() {
 
                 {showEquipmentForm && (
                   <EquipmentForm
-                    onCreate={handleEquipmentCreate}
+                    onSubmit={handleEquipmentCreate}
                     onCancel={() => setShowEquipmentForm(false)}
                   />
                 )}
