@@ -299,6 +299,29 @@ app.get("/api/equipment/:id/guide", requireAuth, async (req, res) => {
   }
 });
 
+app.get("/api/equipment/:id/troubleshooting", requireAuth, async (req, res) => {
+  const equipmentId = Number(req.params.id);
+
+  try {
+    const troubleshooting = await prisma.troubleshooting.findMany({
+      where: {
+        equipmentId,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+
+    return res.json(troubleshooting);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to load troubleshooting information",
+    });
+  }
+});
+
 app.post(
   "/api/equipment/:id/guide",
   requireAuth,
