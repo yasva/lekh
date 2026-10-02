@@ -7,9 +7,12 @@ function EquipmentDetails({
   user,
   onGuideCreate,
   onGuideUpdate,
+  onTroubleshootingCreate,
 }) {
   const [setup, setSetup] = useState("");
   const [usage, setUsage] = useState("");
+  const [problem, setProblem] = useState("");
+  const [solution, setSolution] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const editSectionRef = useRef(null);
   const guideSectionRef = useRef(null);
@@ -61,6 +64,17 @@ function EquipmentDetails({
         block: "start",
       });
     }, 0);
+  }
+
+  async function handleTroubleshootingSubmit(event) {
+    event.preventDefault();
+
+    const success = await onTroubleshootingCreate(problem, solution);
+
+    if (success) {
+      setProblem("");
+      setSolution("");
+    }
   }
 
   return (
@@ -157,6 +171,34 @@ function EquipmentDetails({
           </div>
         )}
       </section>
+
+      {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
+        <section className="details-section guide-management">
+          <h2>Add Troubleshooting Information</h2>
+
+          <form onSubmit={handleTroubleshootingSubmit}>
+            <label htmlFor="troubleshooting-problem">Common problem</label>
+            <textarea
+              id="troubleshooting-problem"
+              value={problem}
+              onChange={(event) => setProblem(event.target.value)}
+              required
+            />
+
+            <label htmlFor="troubleshooting-solution">
+              Possible solution
+            </label>
+            <textarea
+              id="troubleshooting-solution"
+              value={solution}
+              onChange={(event) => setSolution(event.target.value)}
+              required
+            />
+
+            <button type="submit">Add troubleshooting</button>
+          </form>
+        </section>
+      )}
 
       {(user.role === "MAINTAINER" || user.role === "ADMIN") &&
         (!guide || isEditing) && (
