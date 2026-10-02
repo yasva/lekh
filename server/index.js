@@ -323,6 +323,52 @@ app.get("/api/equipment/:id/troubleshooting", requireAuth, async (req, res) => {
 });
 
 app.post(
+  "/api/equipment/:id/troubleshooting",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const equipmentId = Number(req.params.id);
+    const { problem, solution } = req.body;
+
+    if (!problem || !solution) {
+      return res.status(400).json({
+        message: "Problem and solution are required",
+      });
+    }
+
+    try {
+      const equipment = await prisma.equipment.findUnique({
+        where: {
+          id: equipmentId,
+        },
+      });
+
+      if (!equipment) {
+        return res.status(404).json({
+          message: "Equipment not found",
+        });
+      }
+
+      const troubleshooting = await prisma.troubleshooting.create({
+        data: {
+          equipmentId,
+          problem,
+          solution,
+        },
+      });
+
+      return res.status(201).json(troubleshooting);
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to create troubleshooting information",
+      });
+    }
+  },
+);
+
+app.post(
   "/api/equipment/:id/guide",
   requireAuth,
   requireGuideManager,
