@@ -15,6 +15,7 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showEquipmentForm, setShowEquipmentForm] = useState(false);
   const [showEditEquipmentForm, setShowEditEquipmentForm] = useState(false);
+  const [troubleshooting, setTroubleshooting] = useState([]);
 
   useEffect(() => {
     async function checkSession() {
@@ -84,19 +85,31 @@ function App() {
 
       if (guideResponse.status === 404) {
         setGuide(null);
-        setMessage("");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        return;
-      }
-
-      if (!guideResponse.ok) {
+      } else if (!guideResponse.ok) {
         setGuide(null);
         setMessage("Unable to load equipment guide.");
         return;
+      } else {
+        const guideData = await guideResponse.json();
+        setGuide(guideData);
       }
 
-      const guideData = await guideResponse.json();
-      setGuide(guideData);
+      const troubleshootingResponse = await fetch(
+        `/api/equipment/${id}/troubleshooting`,
+        {
+          credentials: "include",
+        },
+      );
+
+      if (!troubleshootingResponse.ok) {
+        setTroubleshooting([]);
+        setMessage("Unable to load troubleshooting information.");
+        return;
+      }
+
+      const troubleshootingData = await troubleshootingResponse.json();
+      setTroubleshooting(troubleshootingData);
+
       setMessage("");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -403,6 +416,7 @@ function App() {
                   <EquipmentDetails
                     equipment={equipment}
                     guide={guide}
+                    troubleshooting={troubleshooting}
                     user={user}
                     onGuideCreate={handleGuideCreate}
                     onGuideUpdate={handleGuideUpdate}
