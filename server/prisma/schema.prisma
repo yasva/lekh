@@ -12,17 +12,19 @@ datasource db {
 }
 
 model Equipment {
-  id                Int      @id @default(autoincrement())
+  id                Int               @id @default(autoincrement())
   name              String
   typeModel         String
   location          String
   totalQuantity     Int
   availableQuantity Int
   condition         String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  approvalRequired  Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
   guides            Guide[]
   troubleshooting   Troubleshooting[]
+  loans             Loan[]
 }
 
 model Guide {
@@ -43,6 +45,33 @@ model Troubleshooting {
   solution    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NOT_REQUIRED
+}
+
+enum LoanStatus {
+  REQUESTED
+  ACTIVE
+  RETURNED
+}
+
+model Loan {
+  id             Int            @id @default(autoincrement())
+  equipmentId    Int
+  borrowerId     Int
+  startDate      DateTime
+  endDate        DateTime
+  approvalStatus ApprovalStatus
+  loanStatus     LoanStatus
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
 }
