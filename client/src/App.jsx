@@ -244,6 +244,46 @@ function App() {
     }
   }
 
+  async function handleTroubleshootingUpdate(
+    troubleshootingId,
+    problem,
+    solution,
+  ) {
+    try {
+      const response = await fetch(
+        `/api/equipment/${equipment.id}/troubleshooting/${troubleshootingId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            problem,
+            solution,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return false;
+      }
+
+      setTroubleshooting((current) =>
+        current.map((item) => (item.id === data.id ? data : item)),
+      );
+
+      setMessage("Troubleshooting information updated successfully.");
+      return true;
+    } catch {
+      setMessage("Unable to connect to the server.");
+      return false;
+    }
+  }
+
   async function handleGuideUpdate(setup, usage) {
     try {
       const response = await fetch(`/api/equipment/${equipment.id}/guide`, {
@@ -454,6 +494,7 @@ function App() {
                     onGuideCreate={handleGuideCreate}
                     onGuideUpdate={handleGuideUpdate}
                     onTroubleshootingCreate={handleTroubleshootingCreate}
+                    onTroubleshootingUpdate={handleTroubleshootingUpdate}
                   />
                 )}
               </>

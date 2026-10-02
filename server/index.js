@@ -368,6 +368,56 @@ app.post(
   },
 );
 
+app.put(
+  "/api/equipment/:equipmentId/troubleshooting/:troubleshootingId",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const equipmentId = Number(req.params.equipmentId);
+    const troubleshootingId = Number(req.params.troubleshootingId);
+    const { problem, solution } = req.body;
+
+    if (!problem || !solution) {
+      return res.status(400).json({
+        message: "Problem and solution are required",
+      });
+    }
+
+    try {
+      const troubleshooting = await prisma.troubleshooting.findFirst({
+        where: {
+          id: troubleshootingId,
+          equipmentId,
+        },
+      });
+
+      if (!troubleshooting) {
+        return res.status(404).json({
+          message: "Troubleshooting information not found",
+        });
+      }
+
+      const updatedTroubleshooting = await prisma.troubleshooting.update({
+        where: {
+          id: troubleshootingId,
+        },
+        data: {
+          problem,
+          solution,
+        },
+      });
+
+      return res.json(updatedTroubleshooting);
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to update troubleshooting information",
+      });
+    }
+  },
+);
+
 app.post(
   "/api/equipment/:id/guide",
   requireAuth,

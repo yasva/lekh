@@ -8,11 +8,14 @@ function EquipmentDetails({
   onGuideCreate,
   onGuideUpdate,
   onTroubleshootingCreate,
+  onTroubleshootingUpdate,
 }) {
   const [setup, setSetup] = useState("");
   const [usage, setUsage] = useState("");
   const [problem, setProblem] = useState("");
   const [solution, setSolution] = useState("");
+  const [editingTroubleshootingId, setEditingTroubleshootingId] =
+    useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const editSectionRef = useRef(null);
   const guideSectionRef = useRef(null);
@@ -66,14 +69,37 @@ function EquipmentDetails({
     }, 0);
   }
 
+  function handleEditTroubleshooting(item) {
+    setProblem(item.problem);
+    setSolution(item.solution);
+    setEditingTroubleshootingId(item.id);
+  }
+
+  function handleCancelTroubleshootingEdit() {
+    setProblem("");
+    setSolution("");
+    setEditingTroubleshootingId(null);
+  }
+
   async function handleTroubleshootingSubmit(event) {
     event.preventDefault();
 
-    const success = await onTroubleshootingCreate(problem, solution);
+    let success;
+
+    if (editingTroubleshootingId !== null) {
+      success = await onTroubleshootingUpdate(
+        editingTroubleshootingId,
+        problem,
+        solution,
+      );
+    } else {
+      success = await onTroubleshootingCreate(problem, solution);
+    }
 
     if (success) {
       setProblem("");
       setSolution("");
+      setEditingTroubleshootingId(null);
     }
   }
 
@@ -158,7 +184,20 @@ function EquipmentDetails({
           <div className="guide-card">
             {troubleshooting.map((item) => (
               <div className="guide-section" key={item.id}>
-                <h3>{item.problem}</h3>
+                <div className="section-heading">
+                  <h3>{item.problem}</h3>
+
+                  {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      onClick={() => handleEditTroubleshooting(item)}
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+
                 <p>
                   <strong>Possible solution:</strong> {item.solution}
                 </p>
@@ -174,7 +213,11 @@ function EquipmentDetails({
 
       {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
         <section className="details-section guide-management">
-          <h2>Add Troubleshooting Information</h2>
+          <h2>
+            {editingTroubleshootingId !== null
+              ? "Edit Troubleshooting Information"
+              : "Add Troubleshooting Information"}
+          </h2>
 
           <form onSubmit={handleTroubleshootingSubmit}>
             <label htmlFor="troubleshooting-problem">Common problem</label>
@@ -185,9 +228,7 @@ function EquipmentDetails({
               required
             />
 
-            <label htmlFor="troubleshooting-solution">
-              Possible solution
-            </label>
+            <label htmlFor="troubleshooting-solution">Possible solution</label>
             <textarea
               id="troubleshooting-solution"
               value={solution}
@@ -195,7 +236,21 @@ function EquipmentDetails({
               required
             />
 
-            <button type="submit">Add troubleshooting</button>
+            <button type="submit">
+              {editingTroubleshootingId !== null
+                ? "Save changes"
+                : "Add troubleshooting"}
+            </button>
+
+            {editingTroubleshootingId !== null && (
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={handleCancelTroubleshootingEdit}
+              >
+                Cancel
+              </button>
+            )}
           </form>
         </section>
       )}
