@@ -515,6 +515,51 @@ app.put(
   },
 );
 
+app.post("/api/loans", requireAuth, async (req, res) => {
+  const { equipmentId, startDate, endDate } = req.body;
+
+  try {
+    const equipment = await prisma.equipment.findUnique({
+      where: {
+        id: Number(equipmentId),
+      },
+    });
+
+    if (!equipment) {
+      return res.status(404).json({
+        message: "Equipment not found",
+      });
+    }
+
+    if (equipment.availableQuantity < 1) {
+      return res.status(409).json({
+        message: "Equipment is not available",
+      });
+    }
+
+    const approvalRequired = equipment.approvalRequired;
+
+    const loan = await prisma.loan.create({
+      data: {
+        equipmentId: equipment.id,
+        borrowerId: req.session.user.id,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        approvalStatus: approvalRequired ? "PENDING" : "NOT_REQUIRED",
+        loanStatus: approvalRequired ? "REQUESTED" : "ACTIVE",
+      },
+    });
+
+    return res.status(201).json(loan);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to submit loan request",
+    });
+  }
+});
+
 app.post("/api/logout", (req, res) => {
   req.session.destroy((error) => {
     if (error) {
