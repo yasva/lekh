@@ -25,6 +25,20 @@ model Equipment {
   guides            Guide[]
   troubleshooting   Troubleshooting[]
   loans             Loan[]
+  units             EquipmentUnit[]
+}
+
+model EquipmentUnit {
+  id          Int      @id @default(autoincrement())
+  equipmentId Int
+  identifier  String   @unique
+  condition   String
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  loans     Loan[]
 }
 
 model Guide {
@@ -63,15 +77,17 @@ enum LoanStatus {
 }
 
 model Loan {
-  id             Int            @id @default(autoincrement())
-  equipmentId    Int
-  borrowerId     Int
-  startDate      DateTime
-  endDate        DateTime
-  approvalStatus ApprovalStatus
-  loanStatus     LoanStatus
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id              Int            @id @default(autoincrement())
+  equipmentId     Int
+  equipmentUnitId Int?
+  borrowerId      Int
+  startDate       DateTime
+  endDate         DateTime
+  approvalStatus  ApprovalStatus
+  loanStatus      LoanStatus
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
-  equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  equipment     Equipment      @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  equipmentUnit EquipmentUnit? @relation(fields: [equipmentUnitId], references: [id], onDelete: SetNull)
 }
