@@ -11,6 +11,8 @@ function App() {
   const [user, setUser] = useState(null);
   const [equipment, setEquipment] = useState(null);
   const [equipmentList, setEquipmentList] = useState([]);
+  const [equipmentSearch, setEquipmentSearch] = useState("");
+  const [equipmentCondition, setEquipmentCondition] = useState("");
   const [guide, setGuide] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showEquipmentForm, setShowEquipmentForm] = useState(false);
@@ -409,6 +411,24 @@ function App() {
     setMessage("");
   }
 
+  const equipmentConditions = [
+    ...new Set(equipmentList.map((item) => item.condition)),
+  ].sort();
+
+  const filteredEquipmentList = equipmentList.filter((item) => {
+    const searchTerm = equipmentSearch.trim().toLowerCase();
+
+    const matchesSearch =
+      !searchTerm ||
+      item.name.toLowerCase().includes(searchTerm) ||
+      item.typeModel.toLowerCase().includes(searchTerm);
+
+    const matchesCondition =
+      !equipmentCondition || item.condition === equipmentCondition;
+
+    return matchesSearch && matchesCondition;
+  });
+
   return (
     <>
       {user ? (
@@ -548,6 +568,39 @@ function App() {
                   Browse laboratory equipment and access equipment guides.
                 </p>
 
+                <div className="equipment-controls">
+                  <div className="equipment-search">
+                    <label htmlFor="equipment-search">Search equipment</label>
+                    <input
+                      id="equipment-search"
+                      type="search"
+                      value={equipmentSearch}
+                      onChange={(event) =>
+                        setEquipmentSearch(event.target.value)
+                      }
+                      placeholder="Search by name or type/model"
+                    />
+                  </div>
+
+                  <div className="equipment-filter">
+                    <label htmlFor="equipment-condition">Condition</label>
+                    <select
+                      id="equipment-condition"
+                      value={equipmentCondition}
+                      onChange={(event) =>
+                        setEquipmentCondition(event.target.value)
+                      }
+                    >
+                      <option value="">All conditions</option>
+                      {equipmentConditions.map((condition) => (
+                        <option key={condition} value={condition}>
+                          {condition}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 {showEquipmentForm && (
                   <EquipmentForm
                     onSubmit={handleEquipmentCreate}
@@ -555,46 +608,52 @@ function App() {
                   />
                 )}
 
-                <div className="equipment-grid">
-                  {equipmentList.map((item) => (
-                    <button
-                      className="equipment-card"
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleEquipmentSelect(item.id)}
-                    >
-                      <div className="equipment-card-header">
-                        <div>
-                          <h2>{item.name}</h2>
-                          <p>{item.typeModel}</p>
+                {filteredEquipmentList.length === 0 ? (
+                  <p className="empty-state">
+                    No equipment matches your search.
+                  </p>
+                ) : (
+                  <div className="equipment-grid">
+                    {filteredEquipmentList.map((item) => (
+                      <button
+                        className="equipment-card"
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleEquipmentSelect(item.id)}
+                      >
+                        <div className="equipment-card-header">
+                          <div>
+                            <h2>{item.name}</h2>
+                            <p>{item.typeModel}</p>
+                          </div>
+
+                          <span className="condition-badge">
+                            {item.condition}
+                          </span>
                         </div>
 
-                        <span className="condition-badge">
-                          {item.condition}
+                        <div className="equipment-card-info">
+                          <p>
+                            <strong>Location</strong>
+                            <span>{item.location}</span>
+                          </p>
+
+                          <p>
+                            <strong>Availability</strong>
+                            <span>
+                              {item.availableQuantity} of {item.totalQuantity}{" "}
+                              available
+                            </span>
+                          </p>
+                        </div>
+
+                        <span className="equipment-card-link">
+                          View equipment →
                         </span>
-                      </div>
-
-                      <div className="equipment-card-info">
-                        <p>
-                          <strong>Location</strong>
-                          <span>{item.location}</span>
-                        </p>
-
-                        <p>
-                          <strong>Availability</strong>
-                          <span>
-                            {item.availableQuantity} of {item.totalQuantity}{" "}
-                            available
-                          </span>
-                        </p>
-                      </div>
-
-                      <span className="equipment-card-link">
-                        View equipment →
-                      </span>
-                    </button>
-                  ))}
-                </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </>
             )}
 
