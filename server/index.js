@@ -570,15 +570,45 @@ app.post("/api/loans", requireAuth, async (req, res) => {
 
     const approvalRequired = equipment.approvalRequired;
 
-    const loan = await prisma.loan.create({
-      data: {
-        equipmentId: equipment.id,
-        borrowerId: req.session.user.id,
-        startDate: parsedStartDate,
-        endDate: parsedEndDate,
-        approvalStatus: approvalRequired ? "PENDING" : "NOT_REQUIRED",
-        loanStatus: approvalRequired ? "REQUESTED" : "ACTIVE",
-      },
+    if (approvalRequired) {
+      const loan = await prisma.loan.create({
+        data: {
+          equipmentId: equipment.id,
+          borrowerId: req.session.user.id,
+          startDate: parsedStartDate,
+          endDate: parsedEndDate,
+          approvalStatus: "PENDING",
+          loanStatus: "REQUESTED",
+        },
+      });
+
+      return res.status(201).json(loan);
+    }
+
+    const loan = await prisma.$transaction(async (transaction) => {
+      const activeLoan = await transaction.loan.create({
+        data: {
+          equipmentId: equipment.id,
+          borrowerId: req.session.user.id,
+          startDate: parsedStartDate,
+          endDate: parsedEndDate,
+          approvalStatus: "NOT_REQUIRED",
+          loanStatus: "ACTIVE",
+        },
+      });
+
+      await transaction.equipment.update({
+        where: {
+          id: equipment.id,
+        },
+        data: {
+          availableQuantity: {
+            decrement: 1,
+          },
+        },
+      });
+
+      return activeLoan;
     });
 
     return res.status(201).json(loan);
