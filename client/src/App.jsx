@@ -205,6 +205,22 @@ function App() {
         return false;
       }
 
+      const equipmentResponse = await fetch(`/api/equipment/${equipment.id}`, {
+        credentials: "include",
+      });
+
+      if (equipmentResponse.ok) {
+        const updatedEquipment = await equipmentResponse.json();
+
+        setEquipment(updatedEquipment);
+
+        setEquipmentList((currentList) =>
+          currentList.map((item) =>
+            item.id === updatedEquipment.id ? updatedEquipment : item,
+          ),
+        );
+      }
+
       setMessage("Loan request submitted successfully.");
       return true;
     } catch {
