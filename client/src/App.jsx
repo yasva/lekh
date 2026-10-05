@@ -20,6 +20,18 @@ function App() {
   const [troubleshooting, setTroubleshooting] = useState([]);
 
   useEffect(() => {
+    if (!message) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setMessage("");
+    }, 4000);
+
+    return () => clearTimeout(timeout);
+  }, [message]);
+
+  useEffect(() => {
     async function checkSession() {
       try {
         const response = await fetch("/api/session", {
@@ -221,7 +233,11 @@ function App() {
         );
       }
 
-      setMessage("Loan request submitted successfully.");
+      setMessage(
+        data.loanStatus === "ACTIVE"
+          ? "Loan registered. The equipment is now on loan to you."
+          : "Loan request submitted and is waiting for approval.",
+      );
       return true;
     } catch {
       setMessage("Unable to connect to the server.");
@@ -447,6 +463,12 @@ function App() {
 
   return (
     <>
+      {message && (
+        <div className="toast-message" role="status" aria-live="polite">
+          {message}
+        </div>
+      )}
+
       {user ? (
         <div className="app-shell">
           <header className="app-header">
@@ -672,8 +694,6 @@ function App() {
                 )}
               </>
             )}
-
-            {message && <p>{message}</p>}
           </main>
         </div>
       ) : (
@@ -716,8 +736,6 @@ function App() {
                 Log in
               </button>
             </form>
-
-            {message && <p>{message}</p>}
           </div>
         </main>
       )}
