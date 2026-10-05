@@ -116,9 +116,74 @@ Your repository must remain **Private** for the entire course. This protects you
 
 ---
 
-## Documenting Your Project
+## User Manual
 
-Once Sprint 2 begins, add a **User Manual** section to this README, covering:
-- **Installing** — what's needed to set up your project locally (dependencies, environment, etc.)
-- **Running** — how to start/execute the application
+### Installing
 
+Requirements: Node.js (LTS) and a running PostgreSQL server.
+
+1. Clone the repository.
+2. Create an empty PostgreSQL database, for example `lekh`.
+3. Create the server environment file:
+
+   ```bash
+   cd server
+   cp .env.example .env
+   ```
+
+   Set `DATABASE_URL` to your database and `SESSION_SECRET` to any long random string.
+
+4. Install the server, create the database tables and load the demo data:
+
+   ```bash
+   npm ci
+   npx prisma migrate deploy
+   npx prisma generate
+   npm run seed
+   ```
+
+5. Install the client:
+
+   ```bash
+   cd ../client
+   npm ci
+   ```
+
+### Running
+
+Start the server and the client in two terminals:
+
+```bash
+# Terminal 1
+cd server
+npm run dev        # API on http://localhost:3000
+
+# Terminal 2
+cd client
+npm run dev        # App on the address Vite prints, usually http://localhost:5173
+```
+
+Log in with one of the test accounts (password `password123` for all):
+
+| Username | Role |
+| --- | --- |
+| `student` | Student |
+| `maintainer` | Maintainer |
+| `admin` | Administrator |
+
+### Resetting the demo data
+
+```bash
+cd server
+npm run seed
+```
+
+**Warning:** this deletes all equipment, guides, troubleshooting entries and loans in the database `DATABASE_URL` points to, then recreates the known demo state. Only run it against your development database.
+
+After a reset, Arduino can be borrowed directly without approval (its available quantity drops by one). All other equipment requires approval, so a loan request stays pending and does not change availability.
+
+### Known limitations
+
+- Loan approval, rejection, return and active-loan management are not implemented yet; they are planned for Sprint 3. Pending loan requests therefore stay pending.
+- The approval requirement is currently stored per equipment item, but there is not yet a user interface for Maintainers/Administrators to configure `approvalRequired`. Approval management is part of the continued loan workflow work.
+- Users are hard-coded test accounts; user and role management is planned for Sprint 3.
