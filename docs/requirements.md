@@ -5,8 +5,8 @@
 **Customer:** Zeth Danielsson  
 **Course:** PA1493 Software Development Project (Distance) HT26  
 **Status:** Draft  
-**Version:** 0.3  
-**Last updated:** 2026-09-21
+**Version:** 0.4
+**Last updated:** 2026-10-12
 
 ## Document History
 
@@ -15,6 +15,7 @@
 | 0.1     | 2026-09-07 | Project description and Customer Meeting 1        | Initial requirements, proposed MVP and open questions                                                                                          |
 | 0.2     | 2026-09-11 | Customer Meeting 2                                | Updated requirements, priorities, permissions, return workflow, equipment quantity model, guide version history and mobile requirements        |
 | 0.3     | 2026-09-21 | Customer Meeting 2 review and Sprint 1 refinement | Clarified equipment type vs physical unit modelling, multi-role responsibilities, knowledge/troubleshooting scope and remaining open questions |
+| 0.4 | 2026-10-12 | Sprint 3 acceptance tests and backlog refinement | Added Sprint 3 implementation scope, acceptance-test traceability and deferred implementation notes without changing customer-confirmed requirements |
 
 ## Requirement Status
 
@@ -1009,7 +1010,55 @@ This section records decisions confirmed during Customer Meeting 2 and identifie
 - project library priority;
 - comment functionality and moderation rules remain deferred because comments are outside the core MVP.
 
-# 6. Current Requirements Summary
+# 6. Sprint 3 Acceptance-Test Traceability (12 October 2026)
+
+This section records **Sprint 3 implementation priorities**, not new customer-confirmed decisions. The customer requirements and their original status remain documented above.
+
+Test outcomes must be recorded separately. Inclusion in this section does not mean that a feature has passed its acceptance test.
+
+| Acceptance Test | Related Requirements | Sprint 3 Backlog | Delivery Priority |
+|---|---|---|---|
+| AT1 – User registration | FR-1, NFR-6, NFR-9 | #66, #126 | Must |
+| AT2 – Authentication and roles | FR-1–FR-2, NFR-6–NFR-7 | #66, #126; existing login/RBAC | Must (regression) |
+| AT3 – Physical unit identity and location | FR-5–FR-9 | #119–#122, #125 | Must |
+| AT4 – Category filtering and availability | FR-8, FR-10, FR-23 | #123, #127; existing #94–#97 | Must |
+| AT5 – Unit-specific out-of-service handling | FR-6, FR-8, FR-27 | #121, #123 | Must |
+| AT6 – Equipment guides | FR-11–FR-15 | Existing guides; #129 verification | Must (regression) |
+| AT7 – Unit-specific fault reporting | FR-25–FR-27 | #47, #72–#73, #93 | Must |
+| AT8 – Known problems on units | FR-6, FR-13 | #125; existing guide/troubleshooting data | Must |
+| AT9 – Unit-specific borrowing | FR-17–FR-21, FR-23 | #43–#44, #124; existing #91 | Must |
+| AT10 – Return and history | FR-21–FR-23 | #46, #71, #90, #92 | Must |
+| AT11 – Mobile usability | NFR-1–NFR-5 | #128–#129 | Must |
+| AT12 – Project library | FR-32–FR-33 | #130–#131 | Should (stretch) |
+| AT13 – Global search | FR-10, FR-11, FR-32 | #132–#133 | Should (stretch) |
+
+## 6.1 Deferred Sprint 3 Implementation
+
+The following functionality remains documented in the requirements specification but is not part of the Sprint 3 core commitment:
+
+- Role administration: #13, #26, #67–#68.
+- Guide version history: #48–#49, #74–#75.
+- QR codes and printable labels: #98–#101.
+
+Deferring these implementations does not remove the underlying customer requirements or change their customer-confirmation status.
+
+## 6.2 Quality Assurance
+
+Completed workflows shall be verified against the relevant acceptance criteria.
+
+Testing shall include:
+
+- Role-based access control and authorization.
+- Equipment-unit data integrity.
+- Loan availability and conflicting requests.
+- Borrowing, approval and return workflows.
+- Fault reporting and equipment status updates.
+- Mobile and desktop layouts.
+- Dark, Light and Auto themes.
+
+Test results shall be recorded as PASS, PARTIAL or FAIL. Identified defects shall be documented, corrected and retested where feasible before Demo 3 on 21 October 2026.
+
+# 7. Current Requirements Summary
 
 The main requirement confirmed through Customer Meetings 1 and 2 is the preservation and accessibility of equipment knowledge.
 
