@@ -63,6 +63,22 @@ model Troubleshooting {
   equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
 }
 
+enum Role {
+  STUDENT
+  MAINTAINER
+  ADMIN
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         Role     @default(STUDENT)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  loans        Loan[]
+}
+
 enum ApprovalStatus {
   PENDING
   APPROVED
@@ -90,4 +106,5 @@ model Loan {
 
   equipment     Equipment      @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
   equipmentUnit EquipmentUnit? @relation(fields: [equipmentUnitId], references: [id], onDelete: SetNull)
+  borrower User @relation(fields: [borrowerId], references: [id], onDelete: Restrict)
 }
