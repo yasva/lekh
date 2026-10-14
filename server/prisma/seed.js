@@ -2,12 +2,21 @@ require("dotenv").config();
 
 const { PrismaClient } = require("@prisma/client");
 const { PrismaPg } = require("@prisma/adapter-pg");
+const bcrypt = require("bcrypt");
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
 });
 
 const prisma = new PrismaClient({ adapter });
+
+const userData = [
+  { username: "student", role: "STUDENT" },
+  { username: "maintainer", role: "MAINTAINER" },
+  { username: "admin", role: "ADMIN" },
+];
+
+const demoPassword = "password123";
 
 const equipmentData = [
   {
@@ -42,8 +51,7 @@ const equipmentData = [
     location: "Lab A - Shelf 1",
     totalQuantity: 12,
     condition: "Available",
-    // Low-risk item that can be borrowed directly, without approval.
-    approvalRequired: false,
+    approvalRequired: true,
     guide: {
       setup:
         "Connect the Arduino Uno to a computer using a USB cable and select the correct board and port in the Arduino IDE.",
@@ -81,7 +89,6 @@ const equipmentData = [
     ],
   },
   {
-    // Intentionally has no guide and no troubleshooting, to show the empty states.
     name: "Logic Analyzer",
     typeModel: "Saleae Logic 8",
     location: "Lab B - Shelf 3",
@@ -94,8 +101,20 @@ const equipmentData = [
 async function main() {
   await prisma.$transaction(async (transaction) => {
     await transaction.$executeRawUnsafe(
-      'TRUNCATE TABLE "Loan", "Troubleshooting", "Guide", "EquipmentUnit", "Equipment" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "Loan", "Troubleshooting", "Guide", "EquipmentUnit", "Equipment", "User" RESTART IDENTITY CASCADE',
     );
+
+    const passwordHash = await bcrypt.hash(demoPassword, 10);
+
+    for (const user of userData) {
+      await transaction.user.create({
+        data: {
+          username: user.username,
+          passwordHash,
+          role: user.role,
+        },
+      });
+    }
 
     for (const item of equipmentData) {
       const equipment = await transaction.equipment.create({
@@ -127,7 +146,8 @@ async function main() {
     }
   });
 
-  const [equipment, guides, troubleshooting, loans] = await Promise.all([
+  const [users, equipment, guides, troubleshooting, loans] = await Promise.all([
+    prisma.user.count(),
     prisma.equipment.count(),
     prisma.guide.count(),
     prisma.troubleshooting.count(),
@@ -135,7 +155,7 @@ async function main() {
   ]);
 
   console.log(
-    `Demo state ready: ${equipment} equipment, ${guides} guides, ${troubleshooting} troubleshooting entries, ${loans} loans.`,
+    `Demo state ready: ${users} users, ${equipment} equipment, ${guides} guides, ${troubleshooting} troubleshooting entries, ${loans} loans.`,
   );
 }
 
