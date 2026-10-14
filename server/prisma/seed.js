@@ -22,6 +22,7 @@ const equipmentData = [
   {
     name: "Raspberry Pi",
     typeModel: "Raspberry Pi 5",
+    category: "Single-board computer",
     location: "Lab A - Shelf 1",
     totalQuantity: 10,
     condition: "Available",
@@ -48,6 +49,7 @@ const equipmentData = [
   {
     name: "Arduino",
     typeModel: "Arduino Uno",
+    category: "Microcontroller",
     location: "Lab A - Shelf 1",
     totalQuantity: 12,
     condition: "Available",
@@ -70,6 +72,7 @@ const equipmentData = [
   {
     name: "Oscilloscope",
     typeModel: "Rigol DS1054Z",
+    category: "Measurement",
     location: "Lab B - Workbench 2",
     totalQuantity: 4,
     condition: "Available",
@@ -91,6 +94,7 @@ const equipmentData = [
   {
     name: "Logic Analyzer",
     typeModel: "Saleae Logic 8",
+    category: "Measurement",
     location: "Lab B - Shelf 3",
     totalQuantity: 3,
     condition: "Available",
@@ -121,6 +125,7 @@ async function main() {
         data: {
           name: item.name,
           typeModel: item.typeModel,
+          category: item.category,
           location: item.location,
           totalQuantity: item.totalQuantity,
           availableQuantity: item.totalQuantity,

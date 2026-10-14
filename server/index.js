@@ -185,7 +185,8 @@ app.post(
   requireAuth,
   requireGuideManager,
   async (req, res) => {
-    const { name, typeModel, totalQuantity, location, condition } = req.body;
+    const { name, typeModel, category, totalQuantity, location, condition } =
+      req.body;
 
     const quantity = Number(totalQuantity);
 
@@ -207,6 +208,7 @@ app.post(
         data: {
           name: name.trim(),
           typeModel: typeModel.trim(),
+          category: category?.trim() || "Other",
           location: location.trim(),
           totalQuantity: quantity,
           availableQuantity: quantity,
@@ -231,7 +233,8 @@ app.put(
   requireGuideManager,
   async (req, res) => {
     const id = Number(req.params.id);
-    const { name, typeModel, totalQuantity, location, condition } = req.body;
+    const { name, typeModel, category, totalQuantity, location, condition } =
+      req.body;
 
     const quantity = Number(totalQuantity);
 
@@ -280,6 +283,7 @@ app.put(
         data: {
           name: name.trim(),
           typeModel: typeModel.trim(),
+          category: category?.trim() || "Other",
           location: location.trim(),
           totalQuantity: quantity,
           availableQuantity: quantity - unavailableQuantity,

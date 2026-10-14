@@ -9,6 +9,7 @@ function EquipmentForm({
 }) {
   const [name, setName] = useState(initialEquipment?.name ?? "");
   const [typeModel, setTypeModel] = useState(initialEquipment?.typeModel ?? "");
+  const [category, setCategory] = useState(initialEquipment?.category ?? "");
   const [totalQuantity, setTotalQuantity] = useState(
     initialEquipment?.totalQuantity ?? 1,
   );
@@ -23,6 +24,7 @@ function EquipmentForm({
     const saved = await onSubmit({
       name,
       typeModel,
+      category,
       totalQuantity: Number(totalQuantity),
       location,
       condition,
@@ -53,6 +55,16 @@ function EquipmentForm({
           type="text"
           value={typeModel}
           onChange={(event) => setTypeModel(event.target.value)}
+          required
+        />
+
+        <label htmlFor="equipment-category">Category</label>
+        <input
+          id="equipment-category"
+          type="text"
+          value={category}
+          onChange={(event) => setCategory(event.target.value)}
+          placeholder="e.g. Measurement"
           required
         />
 

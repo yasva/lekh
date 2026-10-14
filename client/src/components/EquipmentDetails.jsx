@@ -121,6 +121,7 @@ function EquipmentDetails({
     <section className="equipment-details">
       <div className="equipment-details-header">
         <div>
+          <p className="equipment-category">{equipment.category}</p>
           <h1>{equipment.name}</h1>
           <p className="equipment-model">{equipment.typeModel}</p>
         </div>
@@ -157,31 +158,33 @@ function EquipmentDetails({
         </div>
       </section>
 
-      <section className="details-section">
-        <h2>Request equipment</h2>
+      {user.role === "STUDENT" && (
+        <section className="details-section">
+          <h2>Request equipment</h2>
 
-        <form onSubmit={handleLoanSubmit}>
-          <label htmlFor="loan-start-date">Start date</label>
-          <input
-            id="loan-start-date"
-            type="date"
-            value={loanStartDate}
-            onChange={(event) => setLoanStartDate(event.target.value)}
-            required
-          />
+          <form onSubmit={handleLoanSubmit}>
+            <label htmlFor="loan-start-date">Start date</label>
+            <input
+              id="loan-start-date"
+              type="date"
+              value={loanStartDate}
+              onChange={(event) => setLoanStartDate(event.target.value)}
+              required
+            />
 
-          <label htmlFor="loan-end-date">End date</label>
-          <input
-            id="loan-end-date"
-            type="date"
-            value={loanEndDate}
-            onChange={(event) => setLoanEndDate(event.target.value)}
-            required
-          />
+            <label htmlFor="loan-end-date">End date</label>
+            <input
+              id="loan-end-date"
+              type="date"
+              value={loanEndDate}
+              onChange={(event) => setLoanEndDate(event.target.value)}
+              required
+            />
 
-          <button type="submit">Request loan</button>
-        </form>
-      </section>
+            <button type="submit">Request loan</button>
+          </form>
+        </section>
+      )}
 
       <section ref={guideSectionRef} className="details-section">
         <div className="section-heading">
