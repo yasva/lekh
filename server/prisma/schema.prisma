@@ -29,14 +29,21 @@ model Equipment {
   units             EquipmentUnit[]
 }
 
+enum UnitStatus {
+  AVAILABLE
+  ON_LOAN
+  OUT_OF_SERVICE
+}
+
 model EquipmentUnit {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   equipmentId Int
-  identifier  String   @unique
+  identifier  String     @unique
+  location    String
   condition   String
-  status      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      UnitStatus @default(AVAILABLE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
   loans     Loan[]
@@ -107,5 +114,5 @@ model Loan {
 
   equipment     Equipment      @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
   equipmentUnit EquipmentUnit? @relation(fields: [equipmentUnitId], references: [id], onDelete: SetNull)
-  borrower User @relation(fields: [borrowerId], references: [id], onDelete: Restrict)
+  borrower      User           @relation(fields: [borrowerId], references: [id], onDelete: Restrict)
 }
