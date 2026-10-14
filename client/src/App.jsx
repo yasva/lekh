@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { User, Lock, LogIn, LogOut, FlaskConical, Menu, X } from "lucide-react";
+import {
+  User,
+  UserPlus,
+  Lock,
+  LogIn,
+  LogOut,
+  FlaskConical,
+  Menu,
+  X,
+} from "lucide-react";
 import EquipmentDetails from "./components/EquipmentDetails";
 import EquipmentForm from "./components/EquipmentForm";
 
 function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [authMode, setAuthMode] = useState("login");
   const [message, setMessage] = useState("");
   const [user, setUser] = useState(null);
   const [equipment, setEquipment] = useState(null);
@@ -378,27 +389,45 @@ function App() {
     }
   }
 
+  function handleAuthModeChange(mode) {
+    setAuthMode(mode);
+    setPassword("");
+    setConfirmPassword("");
+    setMessage("");
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
+    if (authMode === "register" && password !== confirmPassword) {
+      setMessage("Passwords do not match.");
+      setPassword("");
+      setConfirmPassword("");
+      return;
+    }
+
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        authMode === "register" ? "/api/register" : "/api/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            username,
+            password,
+          }),
         },
-        credentials: "include",
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
         setMessage(data.message);
         setPassword("");
+        setConfirmPassword("");
         return;
       }
 
@@ -406,9 +435,11 @@ function App() {
       setMessage("");
       setUsername("");
       setPassword("");
+      setConfirmPassword("");
     } catch {
       setMessage("Unable to connect to the server.");
       setPassword("");
+      setConfirmPassword("");
     }
   }
 
@@ -702,7 +733,24 @@ function App() {
             <h1>LEKH</h1>
             <p className="login-subtitle">Lab Equipment Knowledge Hub</p>
 
-            <h2>Login</h2>
+            <div className="auth-switch">
+              <button
+                type="button"
+                className={authMode === "login" ? "active" : ""}
+                onClick={() => handleAuthModeChange("login")}
+              >
+                Log in
+              </button>
+              <button
+                type="button"
+                className={authMode === "register" ? "active" : ""}
+                onClick={() => handleAuthModeChange("register")}
+              >
+                Create account
+              </button>
+            </div>
+
+            <h2>{authMode === "register" ? "Create account" : "Login"}</h2>
 
             <form onSubmit={handleSubmit}>
               <label htmlFor="username">
@@ -728,12 +776,35 @@ function App() {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                minLength={authMode === "register" ? 8 : undefined}
                 required
               />
 
+              {authMode === "register" && (
+                <>
+                  <label htmlFor="confirm-password">
+                    <Lock size={18} />
+                    Confirm password
+                  </label>
+
+                  <input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(event) => setConfirmPassword(event.target.value)}
+                    minLength={8}
+                    required
+                  />
+                </>
+              )}
+
               <button type="submit">
-                <LogIn size={18} />
-                Log in
+                {authMode === "register" ? (
+                  <UserPlus size={18} />
+                ) : (
+                  <LogIn size={18} />
+                )}
+                {authMode === "register" ? "Create account" : "Log in"}
               </button>
             </form>
           </div>

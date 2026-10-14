@@ -26,6 +26,29 @@
   color: var(--color-gray-3);
 }
 
+.auth-switch {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.auth-switch button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.auth-switch button.active {
+  background: var(--color-heading);
+  color: var(--color-surface);
+  border-color: var(--color-heading);
+  font-weight: 600;
+}
+
 /* ---------- Application ---------- */
 
 .app-shell {

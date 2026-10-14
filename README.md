@@ -4,15 +4,13 @@
 
 ## Project Description
 
-**Project Name:** *Lab Equipment Knowledge Hub (LEKH)*
-
-**Customer Name:** *Zeth Danielsson*
-
-**Student Full Name:** *Yasaman Vallaee*
+**Project Name:** _Lab Equipment Knowledge Hub (LEKH)_
+**Customer Name:** _Zeth Danielsson_
+**Student Full Name:** _Yasaman Vallaee_
 
 ### Project Aim and Objectives
 
-The aim of the Lab Equipment Knowledge Hub (LEKH) is to provide a centralised 
+The aim of the Lab Equipment Knowledge Hub (LEKH) is to provide a centralised
 and accessible source of knowledge about laboratory equipment.
 
 The system will help students and staff find equipment, access setup guides
@@ -26,11 +24,11 @@ when responsible staff or maintainers change.
 
 ### User Personas
 
-| Name | Characteristics | Needs and Expectations | How will they use the system? |
-| --- | --- | --- | --- |
-| Alex – Student | Student / Equipment User. Internal user with varying levels of technical experience. | Find equipment, understand how to use it, access guides and troubleshooting information, check availability, request equipment, return borrowed equipment and report problems. | Logs in, browses or searches for equipment, opens equipment pages, reads guides, checks availability, requests loans, completes the return checklist when returning equipment and reports faults. |
-| Robin – Lab Assistant | Student assistant with Maintainer responsibilities. Generally has more technical knowledge than an ordinary user and may be responsible for particular equipment. | Maintain equipment information and guides, manage equipment condition, faults and relevant loan requests. | Updates equipment and guides, handles reported faults, updates equipment status and processes relevant loan requests. |
-| Sam – Administrator | Administrator with responsibility for administration and access control. | Manage users, roles, permissions, equipment configuration and maintainer responsibilities. | Manages roles and permissions, assigns maintainers and manages equipment-related access rules. |
+| Name                  | Characteristics                                                                                                                                                   | Needs and Expectations                                                                                                                                                         | How will they use the system?                                                                                                                                                                     |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Alex – Student        | Student / Equipment User. Internal user with varying levels of technical experience.                                                                              | Find equipment, understand how to use it, access guides and troubleshooting information, check availability, request equipment, return borrowed equipment and report problems. | Logs in, browses or searches for equipment, opens equipment pages, reads guides, checks availability, requests loans, completes the return checklist when returning equipment and reports faults. |
+| Robin – Lab Assistant | Student assistant with Maintainer responsibilities. Generally has more technical knowledge than an ordinary user and may be responsible for particular equipment. | Maintain equipment information and guides, manage equipment condition, faults and relevant loan requests.                                                                      | Updates equipment and guides, handles reported faults, updates equipment status and processes relevant loan requests.                                                                             |
+| Sam – Administrator   | Administrator with responsibility for administration and access control.                                                                                          | Manage users, roles, permissions, equipment configuration and maintainer responsibilities.                                                                                     | Manages roles and permissions, assigns maintainers and manages equipment-related access rules.                                                                                                    |
 
 ### Software Requirements
 
@@ -88,7 +86,8 @@ Your backlog lives in two places, working together:
 For every user story, feature and task, create a GitHub Issue with a clear title and description. Use the issue template provided in this repository (see `.github/ISSUE_TEMPLATE/`).
 
 Write them in this order:
-1. All **user stories** first (format: *"As [a user], I want [action] so that [goal]"*)
+
+1. All **user stories** first (format: _"As [a user], I want [action] so that [goal]"_)
 2. Then all **features**
 3. Then all **tasks**
 
@@ -96,21 +95,20 @@ Write them in this order:
 
 Add every Issue to a Project board. The board is your backlog, not the issue text.
 
-Your repository does not come with a board already set up — see **[PROJECT_BOARD.md](PROJECT_BOARD.md)** for step-by-step instructions on creating your board and setting up the required fields (Priority, Estimated Effort, Sprint). 
+Your repository does not come with a board already set up — see **[PROJECT_BOARD.md](PROJECT_BOARD.md)** for step-by-step instructions on creating your board and setting up the required fields (Priority, Estimated Effort, Sprint).
 
 You'll need a working board by the end of Sprint 1, as Status Report 3 requires it.
-
 
 ---
 
 ## Development
 
 From Week 38 onward:
+
 - Set up your development environment and start development.
-- You're free to organise your code however works best for you — for example, using `src/` and `docs/` folders, or any other structure. There's no required folder layout; 
+- You're free to organise your code however works best for you — for example, using `src/` and `docs/` folders, or any other structure. There's no required folder layout;
 - At the end of each sprint, your work will be demonstrated to the customer at that sprint's Demo
 - Keep this README as the one place that always explains how to install and run your project.
-
 
 Your repository must remain **Private** for the entire course. This protects your customer's requirements and your own work.
 
@@ -156,7 +154,7 @@ Start the server and the client in two terminals:
 ```bash
 # Terminal 1
 cd server
-npm run dev        # API on http://localhost:3000
+npm run dev        # API on http://localhost:4000
 
 # Terminal 2
 cd client
@@ -165,11 +163,13 @@ npm run dev        # App on the address Vite prints, usually http://localhost:51
 
 Log in with one of the test accounts (password `password123` for all):
 
-| Username | Role |
-| --- | --- |
-| `student` | Student |
-| `maintainer` | Maintainer |
-| `admin` | Administrator |
+| Username     | Role          |
+| ------------ | ------------- |
+| `student`    | Student       |
+| `maintainer` | Maintainer    |
+| `admin`      | Administrator |
+
+New users can create their own Student account on the login page with **Create account**.
 
 ### Resetting the demo data
 
@@ -178,12 +178,12 @@ cd server
 npm run seed
 ```
 
-**Warning:** this deletes all equipment, guides, troubleshooting entries and loans in the database `DATABASE_URL` points to, then recreates the known demo state. Only run it against your development database.
+**Warning:** this deletes all users, equipment, guides, troubleshooting entries and loans in the database `DATABASE_URL` points to, then recreates the known demo state with the three test accounts. Only run it against your development database.
 
-After a reset, Arduino can be borrowed directly without approval (its available quantity drops by one). All other equipment requires approval, so a loan request stays pending and does not change availability.
+After a reset, all equipment requires approval, so a loan request stays pending and does not change availability.
 
 ### Known limitations
 
 - Loan approval, rejection, return and active-loan management are not implemented yet; they are planned for Sprint 3. Pending loan requests therefore stay pending.
-- The approval requirement is currently stored per equipment item, but there is not yet a user interface for Maintainers/Administrators to configure `approvalRequired`. Approval management is part of the continued loan workflow work.
-- Users are hard-coded test accounts; user and role management is planned for Sprint 3.
+- The approval requirement is currently stored per equipment item, but there is not yet a user interface for Maintainers/Administrators to configure `approvalRequired`.
+- New accounts always get the Student role. There is no user interface for changing roles; the Maintainer and Administrator test accounts are created by the seed.

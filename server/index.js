@@ -13,7 +13,7 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 const app = express();
-const PORT = 3000;
+const PORT = 4000;
 
 app.use(express.json());
 
@@ -25,26 +25,20 @@ app.use(
   }),
 );
 
-const testUsers = [
-  {
-    id: 1,
-    username: "student",
-    passwordHash: bcrypt.hashSync("password123", 10),
-    role: "STUDENT",
-  },
-  {
-    id: 2,
-    username: "maintainer",
-    passwordHash: bcrypt.hashSync("password123", 10),
-    role: "MAINTAINER",
-  },
-  {
-    id: 3,
-    username: "admin",
-    passwordHash: bcrypt.hashSync("password123", 10),
-    role: "ADMIN",
-  },
-];
+const USERNAME_PATTERN = /^[a-z0-9._-]{3,30}$/;
+const MINIMUM_PASSWORD_LENGTH = 8;
+
+function normalizeUsername(username) {
+  return typeof username === "string" ? username.trim().toLowerCase() : "";
+}
+
+function toSessionUser(user) {
+  return {
+    id: user.id,
+    username: user.username,
+    role: user.role,
+  };
+}
 
 function requireAuth(req, res, next) {
   if (!req.session.user) {
@@ -60,8 +54,62 @@ app.get("/", (req, res) => {
   res.json({ message: "LEKH API is running" });
 });
 
+app.post("/api/register", async (req, res) => {
+  const username = normalizeUsername(req.body.username);
+  const { password } = req.body;
+
+  if (!USERNAME_PATTERN.test(username)) {
+    return res.status(400).json({
+      message:
+        "Username must be 3-30 characters and contain only letters, numbers, dots, dashes or underscores",
+    });
+  }
+
+  if (
+    typeof password !== "string" ||
+    password.length < MINIMUM_PASSWORD_LENGTH
+  ) {
+    return res.status(400).json({
+      message: `Password must be at least ${MINIMUM_PASSWORD_LENGTH} characters`,
+    });
+  }
+
+  try {
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // New accounts are always students.
+    const user = await prisma.user.create({
+      data: {
+        username,
+        passwordHash,
+        role: "STUDENT",
+      },
+    });
+
+    req.session.user = toSessionUser(user);
+
+    return res.status(201).json({
+      message: "Registration successful",
+      user: req.session.user,
+    });
+  } catch (error) {
+    if (error.code === "P2002") {
+      return res.status(409).json({
+        message: "Username is already taken",
+      });
+    }
+
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to register user",
+    });
+  }
+});
+
 app.post("/api/login", async (req, res) => {
-  const { username, password } = req.body;
+  const username = normalizeUsername(req.body.username);
+  const { password } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({
@@ -69,32 +117,33 @@ app.post("/api/login", async (req, res) => {
     });
   }
 
-  const user = testUsers.find((testUser) => testUser.username === username);
+  try {
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
 
-  if (!user) {
-    return res.status(401).json({
-      message: "Invalid username or password",
+    const passwordMatches =
+      user && (await bcrypt.compare(password, user.passwordHash));
+
+    if (!passwordMatches) {
+      return res.status(401).json({
+        message: "Invalid username or password",
+      });
+    }
+
+    req.session.user = toSessionUser(user);
+
+    return res.json({
+      message: "Login successful",
+      user: req.session.user,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to log in",
     });
   }
-
-  const passwordMatches = await bcrypt.compare(password, user.passwordHash);
-
-  if (!passwordMatches) {
-    return res.status(401).json({
-      message: "Invalid username or password",
-    });
-  }
-
-  req.session.user = {
-    id: user.id,
-    username: user.username,
-    role: user.role,
-  };
-
-  return res.json({
-    message: "Login successful",
-    user: req.session.user,
-  });
 });
 
 app.get("/api/session", requireAuth, (req, res) => {
