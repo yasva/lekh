@@ -22,6 +22,7 @@ const equipmentData = [
   {
     name: "Raspberry Pi",
     typeModel: "Raspberry Pi 5",
+    unitPrefix: "RPI",
     category: "Single-board computer",
     location: "Lab A - Shelf 1",
     totalQuantity: 10,
@@ -49,6 +50,7 @@ const equipmentData = [
   {
     name: "Arduino",
     typeModel: "Arduino Uno",
+    unitPrefix: "ARD",
     category: "Microcontroller",
     location: "Lab A - Shelf 1",
     totalQuantity: 12,
@@ -72,6 +74,7 @@ const equipmentData = [
   {
     name: "Oscilloscope",
     typeModel: "Rigol DS1054Z",
+    unitPrefix: "OSC",
     category: "Measurement",
     location: "Lab B - Workbench 2",
     totalQuantity: 4,
@@ -94,6 +97,7 @@ const equipmentData = [
   {
     name: "Logic Analyzer",
     typeModel: "Saleae Logic 8",
+    unitPrefix: "LA",
     category: "Measurement",
     location: "Lab B - Shelf 3",
     totalQuantity: 3,
@@ -139,6 +143,13 @@ async function main() {
               },
             },
           }),
+          units: {
+            create: Array.from({ length: item.totalQuantity }, (_, index) => ({
+              identifier: `${item.unitPrefix}-${String(index + 1).padStart(3, "0")}`,
+              location: item.location,
+              condition: "Good",
+            })),
+          },
           ...(item.troubleshooting && {
             troubleshooting: {
               create: item.troubleshooting,
@@ -151,16 +162,18 @@ async function main() {
     }
   });
 
-  const [users, equipment, guides, troubleshooting, loans] = await Promise.all([
-    prisma.user.count(),
-    prisma.equipment.count(),
-    prisma.guide.count(),
-    prisma.troubleshooting.count(),
-    prisma.loan.count(),
-  ]);
+  const [users, equipment, units, guides, troubleshooting, loans] =
+    await Promise.all([
+      prisma.user.count(),
+      prisma.equipment.count(),
+      prisma.equipmentUnit.count(),
+      prisma.guide.count(),
+      prisma.troubleshooting.count(),
+      prisma.loan.count(),
+    ]);
 
   console.log(
-    `Demo state ready: ${users} users, ${equipment} equipment, ${guides} guides, ${troubleshooting} troubleshooting entries, ${loans} loans.`,
+    `Demo state ready: ${users} users, ${equipment} equipment, ${units} units, ${guides} guides, ${troubleshooting} troubleshooting entries, ${loans} loans.`,
   );
 }
 

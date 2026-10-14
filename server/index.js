@@ -152,6 +152,26 @@ app.get("/api/session", requireAuth, (req, res) => {
   });
 });
 
+const unitStatusSelect = {
+  units: {
+    select: {
+      status: true,
+    },
+  },
+};
+
+// Quantities are counted from the physical units, not stored numbers.
+function withUnitCounts(equipment) {
+  const { units, ...rest } = equipment;
+
+  return {
+    ...rest,
+    totalQuantity: units.length,
+    availableQuantity: units.filter((unit) => unit.status === "AVAILABLE")
+      .length,
+  };
+}
+
 function requireGuideManager(req, res, next) {
   const role = req.session.user?.role;
 
@@ -170,9 +190,10 @@ app.get("/api/equipment", requireAuth, async (req, res) => {
       orderBy: {
         name: "asc",
       },
+      include: unitStatusSelect,
     });
 
-    return res.json(equipment);
+    return res.json(equipment.map(withUnitCounts));
   } catch (error) {
     return res.status(500).json({
       message: "Unable to load equipment",
@@ -204,19 +225,36 @@ app.post(
     }
 
     try {
-      const equipment = await prisma.equipment.create({
-        data: {
-          name: name.trim(),
-          typeModel: typeModel.trim(),
-          category: category?.trim() || "Other",
-          location: location.trim(),
-          totalQuantity: quantity,
-          availableQuantity: quantity,
-          condition: condition.trim(),
-        },
+      const equipment = await prisma.$transaction(async (transaction) => {
+        const createdEquipment = await transaction.equipment.create({
+          data: {
+            name: name.trim(),
+            typeModel: typeModel.trim(),
+            category: category?.trim() || "Other",
+            location: location.trim(),
+            totalQuantity: quantity,
+            availableQuantity: quantity,
+            condition: condition.trim(),
+          },
+        });
+
+        // One physical unit per item, e.g. EQ5-001, EQ5-002.
+        await transaction.equipmentUnit.createMany({
+          data: Array.from({ length: quantity }, (_, index) => ({
+            equipmentId: createdEquipment.id,
+            identifier: `EQ${createdEquipment.id}-${String(index + 1).padStart(3, "0")}`,
+            location: location.trim(),
+            condition: "Good",
+          })),
+        });
+
+        return transaction.equipment.findUnique({
+          where: { id: createdEquipment.id },
+          include: unitStatusSelect,
+        });
       });
 
-      return res.status(201).json(equipment);
+      return res.status(201).json(withUnitCounts(equipment));
     } catch (error) {
       console.error(error);
 
@@ -233,10 +271,7 @@ app.put(
   requireGuideManager,
   async (req, res) => {
     const id = Number(req.params.id);
-    const { name, typeModel, category, totalQuantity, location, condition } =
-      req.body;
-
-    const quantity = Number(totalQuantity);
+    const { name, typeModel, category, location, condition } = req.body;
 
     if (!Number.isInteger(id) || id < 1) {
       return res.status(400).json({
@@ -248,9 +283,7 @@ app.put(
       !name?.trim() ||
       !typeModel?.trim() ||
       !location?.trim() ||
-      !condition?.trim() ||
-      !Number.isInteger(quantity) ||
-      quantity < 1
+      !condition?.trim()
     ) {
       return res.status(400).json({
         message: "Valid equipment information is required",
@@ -268,16 +301,7 @@ app.put(
         });
       }
 
-      const unavailableQuantity =
-        existingEquipment.totalQuantity - existingEquipment.availableQuantity;
-
-      if (quantity < unavailableQuantity) {
-        return res.status(400).json({
-          message:
-            "Total quantity cannot be lower than the number of unavailable items",
-        });
-      }
-
+      // Quantity is no longer edited here: it is the number of units.
       const equipment = await prisma.equipment.update({
         where: { id },
         data: {
@@ -285,13 +309,12 @@ app.put(
           typeModel: typeModel.trim(),
           category: category?.trim() || "Other",
           location: location.trim(),
-          totalQuantity: quantity,
-          availableQuantity: quantity - unavailableQuantity,
           condition: condition.trim(),
         },
+        include: unitStatusSelect,
       });
 
-      return res.json(equipment);
+      return res.json(withUnitCounts(equipment));
     } catch (error) {
       console.error(error);
 
@@ -301,13 +324,13 @@ app.put(
     }
   },
 );
-
 app.get("/api/equipment/:id", requireAuth, async (req, res) => {
   const id = Number(req.params.id);
 
   try {
     const equipment = await prisma.equipment.findUnique({
       where: { id },
+      include: unitStatusSelect,
     });
 
     if (!equipment) {
@@ -316,7 +339,7 @@ app.get("/api/equipment/:id", requireAuth, async (req, res) => {
       });
     }
 
-    return res.json(equipment);
+    return res.json(withUnitCounts(equipment));
   } catch (error) {
     return res.status(500).json({
       message: "Unable to load equipment",

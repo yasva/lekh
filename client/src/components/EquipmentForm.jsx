@@ -68,15 +68,19 @@ function EquipmentForm({
           required
         />
 
-        <label htmlFor="equipment-quantity">Quantity</label>
-        <input
-          id="equipment-quantity"
-          type="number"
-          min="1"
-          value={totalQuantity}
-          onChange={(event) => setTotalQuantity(event.target.value)}
-          required
-        />
+        {!initialEquipment && (
+          <>
+            <label htmlFor="equipment-quantity">Quantity</label>
+            <input
+              id="equipment-quantity"
+              type="number"
+              min="1"
+              value={totalQuantity}
+              onChange={(event) => setTotalQuantity(event.target.value)}
+              required
+            />
+          </>
+        )}
 
         <label htmlFor="equipment-location">Location</label>
         <input
