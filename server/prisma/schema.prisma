@@ -15,6 +15,7 @@ model Equipment {
   id                Int               @id @default(autoincrement())
   name              String
   typeModel         String
+  category          String            @default("Other")
   location          String
   totalQuantity     Int
   availableQuantity Int

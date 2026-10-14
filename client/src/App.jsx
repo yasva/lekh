@@ -460,6 +460,12 @@ function App() {
       setUser(null);
       setEquipment(null);
       setGuide(null);
+      setEquipmentSearch("");
+      setEquipmentCondition("");
+      setEquipmentList([]);
+      setTroubleshooting([]);
+      setShowEquipmentForm(false);
+      setShowEditEquipmentForm(false);
       setMessage("You have been logged out.");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -484,7 +490,8 @@ function App() {
     const matchesSearch =
       !searchTerm ||
       item.name.toLowerCase().includes(searchTerm) ||
-      item.typeModel.toLowerCase().includes(searchTerm);
+      item.typeModel.toLowerCase().includes(searchTerm) ||
+      (item.category ?? "").toLowerCase().includes(searchTerm);
 
     const matchesCondition =
       !equipmentCondition || item.condition === equipmentCondition;
@@ -647,7 +654,7 @@ function App() {
                       onChange={(event) =>
                         setEquipmentSearch(event.target.value)
                       }
-                      placeholder="Search by name or type/model"
+                      placeholder="Search by name, model or category"
                     />
                   </div>
 
@@ -692,6 +699,9 @@ function App() {
                       >
                         <div className="equipment-card-header">
                           <div>
+                            <p className="equipment-category">
+                              {item.category}
+                            </p>
                             <h2>{item.name}</h2>
                             <p>{item.typeModel}</p>
                           </div>

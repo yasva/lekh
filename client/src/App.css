@@ -368,7 +368,7 @@
   gap: 1.5rem;
 }
 
-.guide-section + .guide-section {
+.guide-section+.guide-section {
   padding-top: 1.5rem;
   border-top: 1px solid var(--color-border);
 }
@@ -632,4 +632,14 @@ button:hover {
   color: var(--text, #1f2937);
   box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
   text-align: center;
+}
+
+.equipment-card-header .equipment-category,
+.equipment-category {
+  margin: 0 0 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.7;
 }
