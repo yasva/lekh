@@ -1,15 +1,19 @@
 import { useRef, useState } from "react";
+import UnitList from "./UnitList";
 
 function EquipmentDetails({
   equipment,
   guide,
   troubleshooting,
+  units,
   user,
   onLoanRequest,
   onGuideCreate,
   onGuideUpdate,
   onTroubleshootingCreate,
   onTroubleshootingUpdate,
+  onUnitCreate,
+  onUnitUpdate,
 }) {
   const [setup, setSetup] = useState("");
   const [usage, setUsage] = useState("");
@@ -157,6 +161,13 @@ function EquipmentDetails({
           </div>
         </div>
       </section>
+
+      <UnitList
+        units={units}
+        user={user}
+        onUnitCreate={onUnitCreate}
+        onUnitUpdate={onUnitUpdate}
+      />
 
       {user.role === "STUDENT" && (
         <section className="details-section">

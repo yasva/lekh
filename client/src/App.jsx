@@ -29,6 +29,7 @@ function App() {
   const [showEquipmentForm, setShowEquipmentForm] = useState(false);
   const [showEditEquipmentForm, setShowEditEquipmentForm] = useState(false);
   const [troubleshooting, setTroubleshooting] = useState([]);
+  const [units, setUnits] = useState([]);
 
   useEffect(() => {
     if (!message) {
@@ -134,6 +135,19 @@ function App() {
 
       const troubleshootingData = await troubleshootingResponse.json();
       setTroubleshooting(troubleshootingData);
+
+      const unitsResponse = await fetch(`/api/equipment/${id}/units`, {
+        credentials: "include",
+      });
+
+      if (!unitsResponse.ok) {
+        setUnits([]);
+        setMessage("Unable to load units.");
+        return;
+      }
+
+      const unitsData = await unitsResponse.json();
+      setUnits(unitsData);
 
       setMessage("");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -249,6 +263,87 @@ function App() {
           ? "Loan registered. The equipment is now on loan to you."
           : "Loan request submitted and is waiting for approval.",
       );
+      return true;
+    } catch {
+      setMessage("Unable to connect to the server.");
+      return false;
+    }
+  }
+
+  async function refreshEquipment(id) {
+    const response = await fetch(`/api/equipment/${id}`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const updatedEquipment = await response.json();
+
+    setEquipment(updatedEquipment);
+    setEquipmentList((currentList) =>
+      currentList.map((item) =>
+        item.id === updatedEquipment.id ? updatedEquipment : item,
+      ),
+    );
+  }
+
+  async function handleUnitCreate(unitData) {
+    try {
+      const response = await fetch(`/api/equipment/${equipment.id}/units`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(unitData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return false;
+      }
+
+      setUnits((current) =>
+        [...current, data].sort((a, b) =>
+          a.identifier.localeCompare(b.identifier),
+        ),
+      );
+      await refreshEquipment(equipment.id);
+      setMessage("Unit added successfully.");
+      return true;
+    } catch {
+      setMessage("Unable to connect to the server.");
+      return false;
+    }
+  }
+
+  async function handleUnitUpdate(unitId, unitData) {
+    try {
+      const response = await fetch(`/api/units/${unitId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(unitData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return false;
+      }
+
+      setUnits((current) =>
+        current.map((unit) => (unit.id === data.id ? data : unit)),
+      );
+      await refreshEquipment(equipment.id);
+      setMessage("Unit updated successfully.");
       return true;
     } catch {
       setMessage("Unable to connect to the server.");
@@ -464,6 +559,7 @@ function App() {
       setEquipmentCondition("");
       setEquipmentList([]);
       setTroubleshooting([]);
+      setUnits([]);
       setShowEquipmentForm(false);
       setShowEditEquipmentForm(false);
       setMessage("You have been logged out.");
@@ -476,6 +572,7 @@ function App() {
   function handleBackToEquipment() {
     setEquipment(null);
     setGuide(null);
+    setUnits([]);
     setShowEditEquipmentForm(false);
     setMessage("");
   }
@@ -616,12 +713,15 @@ function App() {
                     equipment={equipment}
                     guide={guide}
                     troubleshooting={troubleshooting}
+                    units={units}
                     user={user}
                     onLoanRequest={handleLoanRequest}
                     onGuideCreate={handleGuideCreate}
                     onGuideUpdate={handleGuideUpdate}
                     onTroubleshootingCreate={handleTroubleshootingCreate}
                     onTroubleshootingUpdate={handleTroubleshootingUpdate}
+                    onUnitCreate={handleUnitCreate}
+                    onUnitUpdate={handleUnitUpdate}
                   />
                 )}
               </>
