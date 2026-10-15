@@ -643,3 +643,106 @@ button:hover {
   text-transform: uppercase;
   opacity: 0.7;
 }
+
+/* ---------- Units ---------- */
+
+.unit-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.unit-row {
+  padding: 1rem 1.25rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.unit-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.unit-main strong {
+  color: var(--color-heading);
+}
+
+.unit-main span {
+  color: var(--color-gray-3);
+  font-size: 0.9rem;
+}
+
+.unit-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-pill {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-available {
+  color: #14532d;
+  background: #dcfce7;
+}
+
+.status-on_loan {
+  color: #1e3a8a;
+  background: #dbeafe;
+}
+
+.status-out_of_service {
+  color: #7f1d1d;
+  background: #fee2e2;
+}
+
+.unit-form {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.unit-form h3 {
+  margin: 0 0 0.5rem;
+  color: var(--color-heading);
+}
+
+.unit-form select {
+  width: 100%;
+  padding: 0.75rem;
+
+  color: var(--color-heading);
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+
+  font: inherit;
+}
+
+@media (max-width: 700px) {
+  .unit-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

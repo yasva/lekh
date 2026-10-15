@@ -591,6 +591,154 @@ app.put(
   },
 );
 
+const UNIT_STATUSES = ["AVAILABLE", "ON_LOAN", "OUT_OF_SERVICE"];
+
+app.get("/api/equipment/:id/units", requireAuth, async (req, res) => {
+  const equipmentId = Number(req.params.id);
+
+  try {
+    const units = await prisma.equipmentUnit.findMany({
+      where: { equipmentId },
+      orderBy: { identifier: "asc" },
+    });
+
+    return res.json(units);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to load units",
+    });
+  }
+});
+
+app.post(
+  "/api/equipment/:id/units",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const equipmentId = Number(req.params.id);
+    const { identifier, location, condition } = req.body;
+
+    if (!identifier?.trim() || !location?.trim() || !condition?.trim()) {
+      return res.status(400).json({
+        message: "Identifier, location and condition are required",
+      });
+    }
+
+    try {
+      const equipment = await prisma.equipment.findUnique({
+        where: { id: equipmentId },
+      });
+
+      if (!equipment) {
+        return res.status(404).json({
+          message: "Equipment not found",
+        });
+      }
+
+      const unit = await prisma.equipmentUnit.create({
+        data: {
+          equipmentId,
+          identifier: identifier.trim().toUpperCase(),
+          location: location.trim(),
+          condition: condition.trim(),
+        },
+      });
+
+      return res.status(201).json(unit);
+    } catch (error) {
+      if (error.code === "P2002") {
+        return res.status(409).json({
+          message: "A unit with this identifier already exists",
+        });
+      }
+
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to create unit",
+      });
+    }
+  },
+);
+
+app.put(
+  "/api/units/:id",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const id = Number(req.params.id);
+    const { identifier, location, condition, status } = req.body;
+
+    if (!Number.isInteger(id) || id < 1) {
+      return res.status(400).json({
+        message: "Valid unit ID is required",
+      });
+    }
+
+    if (
+      !identifier?.trim() ||
+      !location?.trim() ||
+      !condition?.trim() ||
+      !UNIT_STATUSES.includes(status)
+    ) {
+      return res.status(400).json({
+        message: "Valid unit information is required",
+      });
+    }
+
+    try {
+      const existingUnit = await prisma.equipmentUnit.findUnique({
+        where: { id },
+      });
+
+      if (!existingUnit) {
+        return res.status(404).json({
+          message: "Unit not found",
+        });
+      }
+
+      // ON_LOAN is set and cleared only by loan approval and return.
+      if ((status === "ON_LOAN") !== (existingUnit.status === "ON_LOAN")) {
+        return res.status(409).json({
+          message: "On-loan status can only be changed through loans",
+        });
+      }
+
+      const unit = await prisma.equipmentUnit.update({
+        where: { id },
+        data: {
+          identifier: identifier.trim().toUpperCase(),
+          location: location.trim(),
+          condition: condition.trim(),
+          status,
+        },
+      });
+
+      return res.json(unit);
+    } catch (error) {
+      if (error.code === "P2025") {
+        return res.status(404).json({
+          message: "Unit not found",
+        });
+      }
+
+      if (error.code === "P2002") {
+        return res.status(409).json({
+          message: "A unit with this identifier already exists",
+        });
+      }
+
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to update unit",
+      });
+    }
+  },
+);
+
 app.post("/api/loans", requireAuth, async (req, res) => {
   const { equipmentId, startDate, endDate } = req.body;
 
