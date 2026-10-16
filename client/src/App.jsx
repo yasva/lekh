@@ -13,6 +13,7 @@ import {
 import EquipmentDetails from "./components/EquipmentDetails";
 import EquipmentForm from "./components/EquipmentForm";
 import MyLoans from "./components/MyLoans";
+import LoanRequests from "./components/LoanRequests";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -33,6 +34,7 @@ function App() {
   const [units, setUnits] = useState([]);
   const [page, setPage] = useState("equipment");
   const [myLoans, setMyLoans] = useState([]);
+  const [loanRequests, setLoanRequests] = useState([]);
 
   useEffect(() => {
     if (!message) {
@@ -545,6 +547,7 @@ function App() {
       setUnits([]);
       setPage("equipment");
       setMyLoans([]);
+      setLoanRequests([]);
       setShowEquipmentForm(false);
       setShowEditEquipmentForm(false);
       setMessage("You have been logged out.");
@@ -572,6 +575,60 @@ function App() {
       setEquipment(null);
       setMessage("");
       window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
+  async function handleShowLoanRequests() {
+    try {
+      const response = await fetch("/api/loan-requests", {
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return;
+      }
+
+      setLoanRequests(data);
+      setPage("loanRequests");
+      setEquipment(null);
+      setMessage("");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
+  async function handleLoanDecision(loanId, decision) {
+    try {
+      const response = await fetch(`/api/loans/${loanId}/${decision}`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      await handleShowLoanRequests();
+
+      const equipmentResponse = await fetch("/api/equipment", {
+        credentials: "include",
+      });
+
+      if (equipmentResponse.ok) {
+        setEquipmentList(await equipmentResponse.json());
+      }
+
+      if (!response.ok) {
+        setMessage(data.message);
+      } else if (decision === "approve") {
+        setMessage("Loan approved. The unit is now on loan.");
+      } else {
+        setMessage("Loan request rejected.");
+      }
     } catch {
       setMessage("Unable to connect to the server.");
     }
@@ -644,6 +701,20 @@ function App() {
                     My loans
                   </button>
                 )}
+
+                {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
+                  <button
+                    className={
+                      page === "loanRequests"
+                        ? "nav-link nav-active"
+                        : "nav-link"
+                    }
+                    type="button"
+                    onClick={handleShowLoanRequests}
+                  >
+                    Loan requests
+                  </button>
+                )}
               </nav>
 
               <div className="user-actions desktop-user-actions">
@@ -702,6 +773,19 @@ function App() {
                     </button>
                   )}
 
+                  {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
+                    <button
+                      className="mobile-nav-item"
+                      type="button"
+                      onClick={() => {
+                        handleShowLoanRequests();
+                        setMenuOpen(false);
+                      }}
+                    >
+                      Loan requests
+                    </button>
+                  )}
+
                   <button
                     className="mobile-logout"
                     type="button"
@@ -721,6 +805,11 @@ function App() {
           <main className="app-content">
             {page === "myLoans" ? (
               <MyLoans loans={myLoans} />
+            ) : page === "loanRequests" ? (
+              <LoanRequests
+                requests={loanRequests}
+                onDecision={handleLoanDecision}
+              />
             ) : equipment ? (
               <>
                 <div className="equipment-navigation">
