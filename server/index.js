@@ -734,6 +734,27 @@ app.put(
   },
 );
 
+app.get("/api/loans/mine", requireAuth, async (req, res) => {
+  try {
+    const loans = await prisma.loan.findMany({
+      where: { borrowerId: req.session.user.id },
+      orderBy: { createdAt: "desc" },
+      include: {
+        equipment: { select: { name: true } },
+        equipmentUnit: { select: { identifier: true, location: true } },
+      },
+    });
+
+    return res.json(loans);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to load loans",
+    });
+  }
+});
+
 app.post("/api/loans", requireAuth, async (req, res) => {
   const { equipmentUnitId, startDate, endDate } = req.body;
 

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import EquipmentDetails from "./components/EquipmentDetails";
 import EquipmentForm from "./components/EquipmentForm";
+import MyLoans from "./components/MyLoans";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -30,6 +31,8 @@ function App() {
   const [showEditEquipmentForm, setShowEditEquipmentForm] = useState(false);
   const [troubleshooting, setTroubleshooting] = useState([]);
   const [units, setUnits] = useState([]);
+  const [page, setPage] = useState("equipment");
+  const [myLoans, setMyLoans] = useState([]);
 
   useEffect(() => {
     if (!message) {
@@ -540,6 +543,8 @@ function App() {
       setEquipmentList([]);
       setTroubleshooting([]);
       setUnits([]);
+      setPage("equipment");
+      setMyLoans([]);
       setShowEquipmentForm(false);
       setShowEditEquipmentForm(false);
       setMessage("You have been logged out.");
@@ -549,7 +554,31 @@ function App() {
     }
   }
 
+  async function handleShowMyLoans() {
+    try {
+      const response = await fetch("/api/loans/mine", {
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return;
+      }
+
+      setMyLoans(data);
+      setPage("myLoans");
+      setEquipment(null);
+      setMessage("");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
   function handleBackToEquipment() {
+    setPage("equipment");
     setEquipment(null);
     setGuide(null);
     setUnits([]);
@@ -594,7 +623,27 @@ function App() {
               </div>
 
               <nav className="desktop-nav" aria-label="Main navigation">
-                <span className="nav-active">Equipment</span>
+                <button
+                  className={
+                    page === "equipment" ? "nav-link nav-active" : "nav-link"
+                  }
+                  type="button"
+                  onClick={handleBackToEquipment}
+                >
+                  Equipment
+                </button>
+
+                {user.role === "STUDENT" && (
+                  <button
+                    className={
+                      page === "myLoans" ? "nav-link nav-active" : "nav-link"
+                    }
+                    type="button"
+                    onClick={handleShowMyLoans}
+                  >
+                    My loans
+                  </button>
+                )}
               </nav>
 
               <div className="user-actions desktop-user-actions">
@@ -640,6 +689,19 @@ function App() {
                     Equipment
                   </button>
 
+                  {user.role === "STUDENT" && (
+                    <button
+                      className="mobile-nav-item"
+                      type="button"
+                      onClick={() => {
+                        handleShowMyLoans();
+                        setMenuOpen(false);
+                      }}
+                    >
+                      My loans
+                    </button>
+                  )}
+
                   <button
                     className="mobile-logout"
                     type="button"
@@ -657,7 +719,9 @@ function App() {
           </header>
 
           <main className="app-content">
-            {equipment ? (
+            {page === "myLoans" ? (
+              <MyLoans loans={myLoans} />
+            ) : equipment ? (
               <>
                 <div className="equipment-navigation">
                   <button
