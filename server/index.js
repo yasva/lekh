@@ -77,7 +77,6 @@ app.post("/api/register", async (req, res) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // New accounts are always students.
     const user = await prisma.user.create({
       data: {
         username,
@@ -160,7 +159,6 @@ const unitStatusSelect = {
   },
 };
 
-// Quantities are counted from the physical units, not stored numbers.
 function withUnitCounts(equipment) {
   const { units, ...rest } = equipment;
 
@@ -238,7 +236,6 @@ app.post(
           },
         });
 
-        // One physical unit per item, e.g. EQ5-001, EQ5-002.
         await transaction.equipmentUnit.createMany({
           data: Array.from({ length: quantity }, (_, index) => ({
             equipmentId: createdEquipment.id,
@@ -301,7 +298,6 @@ app.put(
         });
       }
 
-      // Quantity is no longer edited here: it is the number of units.
       const equipment = await prisma.equipment.update({
         where: { id },
         data: {
@@ -699,7 +695,6 @@ app.put(
         });
       }
 
-      // ON_LOAN is set and cleared only by loan approval and return.
       if ((status === "ON_LOAN") !== (existingUnit.status === "ON_LOAN")) {
         return res.status(409).json({
           message: "On-loan status can only be changed through loans",
@@ -740,21 +735,29 @@ app.put(
 );
 
 app.post("/api/loans", requireAuth, async (req, res) => {
-  const { equipmentId, startDate, endDate } = req.body;
+  const { equipmentUnitId, startDate, endDate } = req.body;
 
-  const parsedEquipmentId = Number(equipmentId);
+  const parsedUnitId = Number(equipmentUnitId);
   const parsedStartDate = new Date(startDate);
   const parsedEndDate = new Date(endDate);
 
   if (
-    !Number.isInteger(parsedEquipmentId) ||
+    !Number.isInteger(parsedUnitId) ||
     !startDate ||
     !endDate ||
     Number.isNaN(parsedStartDate.getTime()) ||
     Number.isNaN(parsedEndDate.getTime())
   ) {
     return res.status(400).json({
-      message: "Valid equipment and borrowing period are required",
+      message: "Valid unit and borrowing period are required",
+    });
+  }
+
+  const today = new Date(new Date().toISOString().slice(0, 10));
+
+  if (parsedStartDate < today) {
+    return res.status(400).json({
+      message: "Start date cannot be in the past",
     });
   }
 
@@ -774,65 +777,46 @@ app.post("/api/loans", requireAuth, async (req, res) => {
   }
 
   try {
-    const equipment = await prisma.equipment.findUnique({
+    const unit = await prisma.equipmentUnit.findUnique({
+      where: { id: parsedUnitId },
+    });
+
+    if (!unit) {
+      return res.status(404).json({
+        message: "Unit not found",
+      });
+    }
+
+    if (unit.status !== "AVAILABLE") {
+      return res.status(409).json({
+        message: "This unit is not available",
+      });
+    }
+
+    const existingRequest = await prisma.loan.findFirst({
       where: {
-        id: parsedEquipmentId,
+        equipmentUnitId: unit.id,
+        borrowerId: req.session.user.id,
+        approvalStatus: "PENDING",
       },
     });
 
-    if (!equipment) {
-      return res.status(404).json({
-        message: "Equipment not found",
-      });
-    }
-
-    if (equipment.availableQuantity < 1) {
+    if (existingRequest) {
       return res.status(409).json({
-        message: "Equipment is not available",
+        message: "You already have a pending request for this unit",
       });
     }
 
-    const approvalRequired = equipment.approvalRequired;
-
-    if (approvalRequired) {
-      const loan = await prisma.loan.create({
-        data: {
-          equipmentId: equipment.id,
-          borrowerId: req.session.user.id,
-          startDate: parsedStartDate,
-          endDate: parsedEndDate,
-          approvalStatus: "PENDING",
-          loanStatus: "REQUESTED",
-        },
-      });
-
-      return res.status(201).json(loan);
-    }
-
-    const loan = await prisma.$transaction(async (transaction) => {
-      const activeLoan = await transaction.loan.create({
-        data: {
-          equipmentId: equipment.id,
-          borrowerId: req.session.user.id,
-          startDate: parsedStartDate,
-          endDate: parsedEndDate,
-          approvalStatus: "NOT_REQUIRED",
-          loanStatus: "ACTIVE",
-        },
-      });
-
-      await transaction.equipment.update({
-        where: {
-          id: equipment.id,
-        },
-        data: {
-          availableQuantity: {
-            decrement: 1,
-          },
-        },
-      });
-
-      return activeLoan;
+    const loan = await prisma.loan.create({
+      data: {
+        equipmentId: unit.equipmentId,
+        equipmentUnitId: unit.id,
+        borrowerId: req.session.user.id,
+        startDate: parsedStartDate,
+        endDate: parsedEndDate,
+        approvalStatus: "PENDING",
+        loanStatus: "REQUESTED",
+      },
     });
 
     return res.status(201).json(loan);
