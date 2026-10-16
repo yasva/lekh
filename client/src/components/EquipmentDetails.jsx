@@ -26,13 +26,24 @@ function EquipmentDetails({
   const guideSectionRef = useRef(null);
   const [loanStartDate, setLoanStartDate] = useState("");
   const [loanEndDate, setLoanEndDate] = useState("");
+  const [loanUnitId, setLoanUnitId] = useState("");
 
-  async function handleLoanSubmit(event) {
+  const availableUnits = units.filter((unit) => unit.status === "AVAILABLE");
+  const selectedUnit = availableUnits.find(
+    (unit) => unit.id === Number(loanUnitId),
+  );
+
+    async function handleLoanSubmit(event) {
     event.preventDefault();
 
-    const submitted = await onLoanRequest(loanStartDate, loanEndDate);
+    const submitted = await onLoanRequest(
+      Number(loanUnitId),
+      loanStartDate,
+      loanEndDate,
+    );
 
     if (submitted) {
+      setLoanUnitId("");
       setLoanStartDate("");
       setLoanEndDate("");
     }
@@ -169,31 +180,59 @@ function EquipmentDetails({
         onUnitUpdate={onUnitUpdate}
       />
 
-      {user.role === "STUDENT" && (
+            {user.role === "STUDENT" && (
         <section className="details-section">
           <h2>Request equipment</h2>
 
-          <form onSubmit={handleLoanSubmit}>
-            <label htmlFor="loan-start-date">Start date</label>
-            <input
-              id="loan-start-date"
-              type="date"
-              value={loanStartDate}
-              onChange={(event) => setLoanStartDate(event.target.value)}
-              required
-            />
+          {availableUnits.length === 0 ? (
+            <div className="guide-card">
+              <p>No units are available right now.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleLoanSubmit}>
+              <label htmlFor="loan-unit">Unit</label>
+              <select
+                id="loan-unit"
+                value={loanUnitId}
+                onChange={(event) => setLoanUnitId(event.target.value)}
+                required
+              >
+                <option value="">Choose a unit</option>
+                {availableUnits.map((unit) => (
+                  <option key={unit.id} value={unit.id}>
+                    {unit.identifier}
+                  </option>
+                ))}
+              </select>
 
-            <label htmlFor="loan-end-date">End date</label>
-            <input
-              id="loan-end-date"
-              type="date"
-              value={loanEndDate}
-              onChange={(event) => setLoanEndDate(event.target.value)}
-              required
-            />
+              {selectedUnit && (
+                <p className="loan-unit-info">
+                  {selectedUnit.identifier} is available at{" "}
+                  {selectedUnit.location}. Condition: {selectedUnit.condition}.
+                </p>
+              )}
 
-            <button type="submit">Request loan</button>
-          </form>
+              <label htmlFor="loan-start-date">Start date</label>
+              <input
+                id="loan-start-date"
+                type="date"
+                value={loanStartDate}
+                onChange={(event) => setLoanStartDate(event.target.value)}
+                required
+              />
+
+              <label htmlFor="loan-end-date">End date</label>
+              <input
+                id="loan-end-date"
+                type="date"
+                value={loanEndDate}
+                onChange={(event) => setLoanEndDate(event.target.value)}
+                required
+              />
+
+              <button type="submit">Request loan</button>
+            </form>
+          )}
         </section>
       )}
 

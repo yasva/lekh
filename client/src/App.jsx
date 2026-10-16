@@ -220,7 +220,7 @@ function App() {
     }
   }
 
-  async function handleLoanRequest(startDate, endDate) {
+  async function handleLoanRequest(equipmentUnitId, startDate, endDate) {
     try {
       const response = await fetch("/api/loans", {
         method: "POST",
@@ -229,7 +229,7 @@ function App() {
         },
         credentials: "include",
         body: JSON.stringify({
-          equipmentId: equipment.id,
+          equipmentUnitId,
           startDate,
           endDate,
         }),
@@ -242,27 +242,7 @@ function App() {
         return false;
       }
 
-      const equipmentResponse = await fetch(`/api/equipment/${equipment.id}`, {
-        credentials: "include",
-      });
-
-      if (equipmentResponse.ok) {
-        const updatedEquipment = await equipmentResponse.json();
-
-        setEquipment(updatedEquipment);
-
-        setEquipmentList((currentList) =>
-          currentList.map((item) =>
-            item.id === updatedEquipment.id ? updatedEquipment : item,
-          ),
-        );
-      }
-
-      setMessage(
-        data.loanStatus === "ACTIVE"
-          ? "Loan registered. The equipment is now on loan to you."
-          : "Loan request submitted and is waiting for approval.",
-      );
+      setMessage("Loan request submitted and is waiting for approval.");
       return true;
     } catch {
       setMessage("Unable to connect to the server.");
