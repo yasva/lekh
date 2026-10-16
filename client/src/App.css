@@ -858,3 +858,12 @@ button:hover {
     align-items: flex-start;
   }
 }
+
+.loan-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.loan-actions button {
+  margin: 0;
+}

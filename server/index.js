@@ -850,6 +850,157 @@ app.post("/api/loans", requireAuth, async (req, res) => {
   }
 });
 
+app.get(
+  "/api/loan-requests",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    try {
+      const loans = await prisma.loan.findMany({
+        where: { approvalStatus: "PENDING" },
+        orderBy: { createdAt: "asc" },
+        include: {
+          equipment: { select: { name: true } },
+          equipmentUnit: {
+            select: { identifier: true, location: true, status: true },
+          },
+          borrower: { select: { username: true } },
+        },
+      });
+
+      return res.json(loans);
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to load loan requests",
+      });
+    }
+  },
+);
+
+class LoanDecisionError extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
+  }
+}
+
+async function findPendingLoan(transaction, id) {
+  const loan = await transaction.loan.findUnique({ where: { id } });
+
+  if (!loan) {
+    throw new LoanDecisionError(404, "Loan request not found");
+  }
+
+  if (loan.approvalStatus !== "PENDING") {
+    throw new LoanDecisionError(409, "This request has already been decided");
+  }
+
+  return loan;
+}
+
+function sendLoanDecisionError(res, error, fallbackMessage) {
+  if (error instanceof LoanDecisionError) {
+    return res.status(error.status).json({ message: error.message });
+  }
+
+  console.error(error);
+
+  return res.status(500).json({ message: fallbackMessage });
+}
+
+app.post(
+  "/api/loans/:id/approve",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id < 1) {
+      return res.status(400).json({
+        message: "Valid loan ID is required",
+      });
+    }
+
+    try {
+      const loan = await prisma.$transaction(async (transaction) => {
+        const pendingLoan = await findPendingLoan(transaction, id);
+
+        if (!pendingLoan.equipmentUnitId) {
+          throw new LoanDecisionError(409, "This request has no unit");
+        }
+
+        const unitUpdate = await transaction.equipmentUnit.updateMany({
+          where: { id: pendingLoan.equipmentUnitId, status: "AVAILABLE" },
+          data: { status: "ON_LOAN" },
+        });
+
+        if (unitUpdate.count === 0) {
+          throw new LoanDecisionError(409, "This unit is no longer available");
+        }
+
+        const loanUpdate = await transaction.loan.updateMany({
+          where: { id, approvalStatus: "PENDING" },
+          data: { approvalStatus: "APPROVED", loanStatus: "ACTIVE" },
+        });
+
+        if (loanUpdate.count === 0) {
+          throw new LoanDecisionError(
+            409,
+            "This request has already been decided",
+          );
+        }
+
+        return transaction.loan.findUnique({ where: { id } });
+      });
+
+      return res.json(loan);
+    } catch (error) {
+      return sendLoanDecisionError(res, error, "Unable to approve loan");
+    }
+  },
+);
+
+app.post(
+  "/api/loans/:id/reject",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id < 1) {
+      return res.status(400).json({
+        message: "Valid loan ID is required",
+      });
+    }
+
+    try {
+      const loan = await prisma.$transaction(async (transaction) => {
+        await findPendingLoan(transaction, id);
+
+        const loanUpdate = await transaction.loan.updateMany({
+          where: { id, approvalStatus: "PENDING" },
+          data: { approvalStatus: "REJECTED" },
+        });
+
+        if (loanUpdate.count === 0) {
+          throw new LoanDecisionError(
+            409,
+            "This request has already been decided",
+          );
+        }
+
+        return transaction.loan.findUnique({ where: { id } });
+      });
+
+      return res.json(loan);
+    } catch (error) {
+      return sendLoanDecisionError(res, error, "Unable to reject loan");
+    }
+  },
+);
+
 app.post("/api/logout", (req, res) => {
   req.session.destroy((error) => {
     if (error) {
