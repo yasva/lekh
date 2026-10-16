@@ -368,7 +368,7 @@
   gap: 1.5rem;
 }
 
-.guide-section+.guide-section {
+.guide-section + .guide-section {
   padding-top: 1.5rem;
   border-top: 1px solid var(--color-border);
 }
@@ -766,4 +766,95 @@ button:hover {
   margin: 0.5rem 0 1rem;
   color: var(--color-gray-3);
   font-size: 0.9rem;
+}
+
+/* ---------- Navigation and My loans ---------- */
+
+.desktop-nav {
+  gap: 1.25rem;
+}
+
+.nav-link {
+  margin: 0;
+  padding: 0.25rem 0;
+
+  color: var(--color-gray-3);
+  background: none;
+
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: var(--color-heading);
+  background: none;
+}
+
+.nav-link.nav-active {
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.loan-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.loan-row {
+  padding: 1rem 1.25rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.loan-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.loan-main strong {
+  color: var(--color-heading);
+}
+
+.loan-main span {
+  color: var(--color-gray-3);
+  font-size: 0.9rem;
+}
+
+.loan-status-pending {
+  color: #78350f;
+  background: #fef3c7;
+}
+
+.loan-status-active {
+  color: #1e3a8a;
+  background: #dbeafe;
+}
+
+.loan-status-returned {
+  color: #14532d;
+  background: #dcfce7;
+}
+
+.loan-status-rejected {
+  color: #7f1d1d;
+  background: #fee2e2;
+}
+
+@media (max-width: 700px) {
+  .loan-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
