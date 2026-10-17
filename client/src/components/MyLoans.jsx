@@ -18,7 +18,7 @@ function formatDate(value) {
   return new Date(value).toLocaleDateString("en-GB", { timeZone: "UTC" });
 }
 
-function MyLoans({ loans }) {
+function MyLoans({ loans, onReturn }) {
   return (
     <>
       <div className="section-heading">
@@ -44,11 +44,22 @@ function MyLoans({ loans }) {
                   <span>
                     {formatDate(loan.startDate)} to {formatDate(loan.endDate)}
                   </span>
+                  {loan.returnedAt && (
+                    <span>Returned {formatDate(loan.returnedAt)}</span>
+                  )}
                 </div>
 
-                <span className={`status-pill loan-status-${status.key}`}>
-                  {status.label}
-                </span>
+                <div className="loan-actions">
+                  <span className={`status-pill loan-status-${status.key}`}>
+                    {status.label}
+                  </span>
+
+                  {status.key === "active" && (
+                    <button type="button" onClick={() => onReturn(loan.id)}>
+                      Return
+                    </button>
+                  )}
+                </div>
               </li>
             );
           })}

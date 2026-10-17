@@ -580,6 +580,35 @@ function App() {
     }
   }
 
+  async function handleLoanReturn(loanId) {
+    try {
+      const response = await fetch(`/api/loans/${loanId}/return`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      await handleShowMyLoans();
+
+      const equipmentResponse = await fetch("/api/equipment", {
+        credentials: "include",
+      });
+
+      if (equipmentResponse.ok) {
+        setEquipmentList(await equipmentResponse.json());
+      }
+
+      setMessage(
+        response.ok
+          ? "Loan returned. The unit is available again."
+          : data.message,
+      );
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
   async function handleShowLoanRequests() {
     try {
       const response = await fetch("/api/loan-requests", {
@@ -804,7 +833,7 @@ function App() {
 
           <main className="app-content">
             {page === "myLoans" ? (
-              <MyLoans loans={myLoans} />
+              <MyLoans loans={myLoans} onReturn={handleLoanReturn} />
             ) : page === "loanRequests" ? (
               <LoanRequests
                 requests={loanRequests}
