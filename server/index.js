@@ -659,6 +659,63 @@ app.post(
   },
 );
 
+app.get("/api/units/:id", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id < 1) {
+    return res.status(400).json({
+      message: "Valid unit ID is required",
+    });
+  }
+
+  try {
+    const unit = await prisma.equipmentUnit.findUnique({
+      where: { id },
+      include: {
+        equipment: {
+          select: {
+            id: true,
+            name: true,
+            typeModel: true,
+            category: true,
+            troubleshooting: { orderBy: { id: "asc" } },
+          },
+        },
+        loans: {
+          where: { approvalStatus: "APPROVED" },
+          orderBy: { startDate: "desc" },
+          select: {
+            id: true,
+            startDate: true,
+            endDate: true,
+            loanStatus: true,
+            returnedAt: true,
+            borrower: { select: { username: true } },
+          },
+        },
+      },
+    });
+
+    if (!unit) {
+      return res.status(404).json({
+        message: "Unit not found",
+      });
+    }
+
+    if (req.session.user.role === "STUDENT") {
+      unit.loans = unit.loans.map((loan) => ({ ...loan, borrower: null }));
+    }
+
+    return res.json(unit);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to load unit",
+    });
+  }
+});
+
 app.put(
   "/api/units/:id",
   requireAuth,
@@ -1000,6 +1057,55 @@ app.post(
     }
   },
 );
+
+app.post("/api/loans/:id/return", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id < 1) {
+    return res.status(400).json({
+      message: "Valid loan ID is required",
+    });
+  }
+
+  try {
+    const loan = await prisma.$transaction(async (transaction) => {
+      const activeLoan = await transaction.loan.findUnique({ where: { id } });
+
+      if (!activeLoan) {
+        throw new LoanDecisionError(404, "Loan not found");
+      }
+
+      if (activeLoan.borrowerId !== req.session.user.id) {
+        throw new LoanDecisionError(
+          403,
+          "Only the borrower can return this loan",
+        );
+      }
+
+      const loanUpdate = await transaction.loan.updateMany({
+        where: { id, loanStatus: "ACTIVE" },
+        data: { loanStatus: "RETURNED", returnedAt: new Date() },
+      });
+
+      if (loanUpdate.count === 0) {
+        throw new LoanDecisionError(409, "Only active loans can be returned");
+      }
+
+      if (activeLoan.equipmentUnitId) {
+        await transaction.equipmentUnit.updateMany({
+          where: { id: activeLoan.equipmentUnitId, status: "ON_LOAN" },
+          data: { status: "AVAILABLE" },
+        });
+      }
+
+      return transaction.loan.findUnique({ where: { id } });
+    });
+
+    return res.json(loan);
+  } catch (error) {
+    return sendLoanDecisionError(res, error, "Unable to return loan");
+  }
+});
 
 app.post("/api/logout", (req, res) => {
   req.session.destroy((error) => {

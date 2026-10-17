@@ -13,7 +13,7 @@ const emptyUnit = {
   status: "AVAILABLE",
 };
 
-function UnitList({ units, user, onUnitCreate, onUnitUpdate }) {
+function UnitList({ units, user, onUnitCreate, onUnitUpdate, onUnitSelect }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingUnitId, setEditingUnitId] = useState(null);
   const [form, setForm] = useState(emptyUnit);
@@ -157,6 +157,14 @@ function UnitList({ units, user, onUnitCreate, onUnitUpdate }) {
                 >
                   {STATUS_LABELS[unit.status]}
                 </span>
+
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => onUnitSelect(unit.id)}
+                >
+                  View
+                </button>
 
                 {canManage && (
                   <button

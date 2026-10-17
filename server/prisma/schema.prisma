@@ -109,6 +109,7 @@ model Loan {
   endDate         DateTime
   approvalStatus  ApprovalStatus
   loanStatus      LoanStatus
+  returnedAt      DateTime?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 

@@ -14,6 +14,7 @@ function EquipmentDetails({
   onTroubleshootingUpdate,
   onUnitCreate,
   onUnitUpdate,
+  onUnitSelect,
 }) {
   const [setup, setSetup] = useState("");
   const [usage, setUsage] = useState("");
@@ -33,7 +34,7 @@ function EquipmentDetails({
     (unit) => unit.id === Number(loanUnitId),
   );
 
-    async function handleLoanSubmit(event) {
+  async function handleLoanSubmit(event) {
     event.preventDefault();
 
     const submitted = await onLoanRequest(
@@ -178,9 +179,10 @@ function EquipmentDetails({
         user={user}
         onUnitCreate={onUnitCreate}
         onUnitUpdate={onUnitUpdate}
+        onUnitSelect={onUnitSelect}
       />
 
-            {user.role === "STUDENT" && (
+      {user.role === "STUDENT" && (
         <section className="details-section">
           <h2>Request equipment</h2>
 
