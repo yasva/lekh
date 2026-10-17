@@ -605,6 +605,41 @@ function App() {
     }
   }
 
+  async function handleFaultReport(unitId, description) {
+    try {
+      const response = await fetch(`/api/units/${unitId}/faults`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ description }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return false;
+      }
+
+      // Reload the unit so the new fault shows in the list.
+      const unitResponse = await fetch(`/api/units/${unitId}`, {
+        credentials: "include",
+      });
+
+      if (unitResponse.ok) {
+        setUnitDetails(await unitResponse.json());
+      }
+
+      setMessage("Fault reported. Thank you.");
+      return true;
+    } catch {
+      setMessage("Unable to connect to the server.");
+      return false;
+    }
+  }
+
   async function handleBackFromUnit() {
     const equipmentId = unitDetails.equipment.id;
 
@@ -868,7 +903,11 @@ function App() {
             {page === "myLoans" ? (
               <MyLoans loans={myLoans} onReturn={handleLoanReturn} />
             ) : page === "unit" && unitDetails ? (
-              <UnitDetails unit={unitDetails} onBack={handleBackFromUnit} />
+              <UnitDetails
+                unit={unitDetails}
+                onBack={handleBackFromUnit}
+                onFaultReport={handleFaultReport}
+              />
             ) : page === "loanRequests" ? (
               <LoanRequests
                 requests={loanRequests}

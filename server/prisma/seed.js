@@ -109,7 +109,7 @@ const equipmentData = [
 async function main() {
   await prisma.$transaction(async (transaction) => {
     await transaction.$executeRawUnsafe(
-      'TRUNCATE TABLE "Loan", "Troubleshooting", "Guide", "EquipmentUnit", "Equipment", "User" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "Fault", "Loan", "Troubleshooting", "Guide", "EquipmentUnit", "Equipment", "User" RESTART IDENTITY CASCADE',
     );
 
     const passwordHash = await bcrypt.hash(demoPassword, 10);
