@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const STATUS_LABELS = {
   AVAILABLE: "Available",
   ON_LOAN: "On loan",
@@ -8,8 +10,19 @@ function formatDate(value) {
   return new Date(value).toLocaleDateString("en-GB", { timeZone: "UTC" });
 }
 
-function UnitDetails({ unit, onBack }) {
+function UnitDetails({ unit, onBack, onFaultReport }) {
   const { equipment } = unit;
+  const [faultDescription, setFaultDescription] = useState("");
+
+  async function handleFaultSubmit(event) {
+    event.preventDefault();
+
+    const reported = await onFaultReport(unit.id, faultDescription);
+
+    if (reported) {
+      setFaultDescription("");
+    }
+  }
 
   return (
     <>
@@ -69,6 +82,45 @@ function UnitDetails({ unit, onBack }) {
               <p>No known problems recorded for this equipment type.</p>
             </div>
           )}
+        </section>
+
+        <section className="details-section">
+          <h2>Reported faults</h2>
+
+          {unit.faults.length === 0 ? (
+            <div className="guide-card">
+              <p>No faults have been reported for this unit.</p>
+            </div>
+          ) : (
+            <ul className="loan-list">
+              {unit.faults.map((fault) => (
+                <li className="loan-row" key={fault.id}>
+                  <div className="loan-main">
+                    <strong>{fault.description}</strong>
+                    <span>
+                      Reported {formatDate(fault.createdAt)}
+                      {fault.reporter && ` by ${fault.reporter.username}`}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <form className="fault-form" onSubmit={handleFaultSubmit}>
+            <label htmlFor="fault-description">Report a fault</label>
+            <textarea
+              id="fault-description"
+              value={faultDescription}
+              onChange={(event) => setFaultDescription(event.target.value)}
+              placeholder="What is wrong with this unit?"
+              maxLength={1000}
+              rows={3}
+              required
+            />
+
+            <button type="submit">Report fault</button>
+          </form>
         </section>
 
         <section className="details-section">

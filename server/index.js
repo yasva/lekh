@@ -693,6 +693,15 @@ app.get("/api/units/:id", requireAuth, async (req, res) => {
             borrower: { select: { username: true } },
           },
         },
+        faults: {
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            description: true,
+            createdAt: true,
+            reporter: { select: { username: true } },
+          },
+        },
       },
     });
 
@@ -702,8 +711,11 @@ app.get("/api/units/:id", requireAuth, async (req, res) => {
       });
     }
 
+    // Students see when a unit was borrowed and what is wrong with it,
+    // but not who borrowed it or who reported the fault.
     if (req.session.user.role === "STUDENT") {
       unit.loans = unit.loans.map((loan) => ({ ...loan, borrower: null }));
+      unit.faults = unit.faults.map((fault) => ({ ...fault, reporter: null }));
     }
 
     return res.json(unit);
@@ -712,6 +724,54 @@ app.get("/api/units/:id", requireAuth, async (req, res) => {
 
     return res.status(500).json({
       message: "Unable to load unit",
+    });
+  }
+});
+
+const MAXIMUM_FAULT_LENGTH = 1000;
+
+app.post("/api/units/:id/faults", requireAuth, async (req, res) => {
+  const equipmentUnitId = Number(req.params.id);
+  const description =
+    typeof req.body.description === "string" ? req.body.description.trim() : "";
+
+  if (!Number.isInteger(equipmentUnitId) || equipmentUnitId < 1) {
+    return res.status(400).json({
+      message: "Valid unit ID is required",
+    });
+  }
+
+  if (!description || description.length > MAXIMUM_FAULT_LENGTH) {
+    return res.status(400).json({
+      message: `Describe the fault in 1-${MAXIMUM_FAULT_LENGTH} characters`,
+    });
+  }
+
+  try {
+    const unit = await prisma.equipmentUnit.findUnique({
+      where: { id: equipmentUnitId },
+    });
+
+    if (!unit) {
+      return res.status(404).json({
+        message: "Unit not found",
+      });
+    }
+
+    const fault = await prisma.fault.create({
+      data: {
+        equipmentUnitId,
+        reporterId: req.session.user.id,
+        description,
+      },
+    });
+
+    return res.status(201).json(fault);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to report fault",
     });
   }
 });

@@ -867,3 +867,7 @@ button:hover {
 .loan-actions button {
   margin: 0;
 }
+
+.fault-form {
+  margin-top: 1rem;
+}
