@@ -14,6 +14,7 @@ import EquipmentDetails from "./components/EquipmentDetails";
 import EquipmentForm from "./components/EquipmentForm";
 import MyLoans from "./components/MyLoans";
 import LoanRequests from "./components/LoanRequests";
+import UnitDetails from "./components/UnitDetails";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -35,6 +36,7 @@ function App() {
   const [page, setPage] = useState("equipment");
   const [myLoans, setMyLoans] = useState([]);
   const [loanRequests, setLoanRequests] = useState([]);
+  const [unitDetails, setUnitDetails] = useState(null);
 
   useEffect(() => {
     if (!message) {
@@ -548,6 +550,7 @@ function App() {
       setPage("equipment");
       setMyLoans([]);
       setLoanRequests([]);
+      setUnitDetails(null);
       setShowEquipmentForm(false);
       setShowEditEquipmentForm(false);
       setMessage("You have been logged out.");
@@ -578,6 +581,36 @@ function App() {
     } catch {
       setMessage("Unable to connect to the server.");
     }
+  }
+
+  async function handleUnitSelect(unitId) {
+    try {
+      const response = await fetch(`/api/units/${unitId}`, {
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return;
+      }
+
+      setUnitDetails(data);
+      setPage("unit");
+      setMessage("");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
+  async function handleBackFromUnit() {
+    const equipmentId = unitDetails.equipment.id;
+
+    setPage("equipment");
+    setUnitDetails(null);
+    await handleEquipmentSelect(equipmentId);
   }
 
   async function handleLoanReturn(loanId) {
@@ -834,6 +867,8 @@ function App() {
           <main className="app-content">
             {page === "myLoans" ? (
               <MyLoans loans={myLoans} onReturn={handleLoanReturn} />
+            ) : page === "unit" && unitDetails ? (
+              <UnitDetails unit={unitDetails} onBack={handleBackFromUnit} />
             ) : page === "loanRequests" ? (
               <LoanRequests
                 requests={loanRequests}
@@ -884,6 +919,7 @@ function App() {
                     onTroubleshootingUpdate={handleTroubleshootingUpdate}
                     onUnitCreate={handleUnitCreate}
                     onUnitUpdate={handleUnitUpdate}
+                    onUnitSelect={handleUnitSelect}
                   />
                 )}
               </>
