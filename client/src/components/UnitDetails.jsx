@@ -102,6 +102,11 @@ function UnitDetails({ unit, onBack, onFaultReport }) {
                       {fault.reporter && ` by ${fault.reporter.username}`}
                     </span>
                   </div>
+                  <span
+                    className={`status-pill fault-status-${fault.status.toLowerCase()}`}
+                  >
+                    {fault.status === "OPEN" ? "Open" : "Resolved"}
+                  </span>
                 </li>
               ))}
             </ul>
