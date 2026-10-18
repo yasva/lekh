@@ -698,6 +698,7 @@ app.get("/api/units/:id", requireAuth, async (req, res) => {
           select: {
             id: true,
             description: true,
+            status: true,
             createdAt: true,
             reporter: { select: { username: true } },
           },
@@ -711,8 +712,6 @@ app.get("/api/units/:id", requireAuth, async (req, res) => {
       });
     }
 
-    // Students see when a unit was borrowed and what is wrong with it,
-    // but not who borrowed it or who reported the fault.
     if (req.session.user.role === "STUDENT") {
       unit.loans = unit.loans.map((loan) => ({ ...loan, borrower: null }));
       unit.faults = unit.faults.map((fault) => ({ ...fault, reporter: null }));
@@ -775,6 +774,77 @@ app.post("/api/units/:id/faults", requireAuth, async (req, res) => {
     });
   }
 });
+
+app.get("/api/faults", requireAuth, requireGuideManager, async (req, res) => {
+  try {
+    const faults = await prisma.fault.findMany({
+      orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+      include: {
+        equipmentUnit: {
+          select: {
+            id: true,
+            identifier: true,
+            location: true,
+            equipment: { select: { name: true } },
+          },
+        },
+        reporter: { select: { username: true } },
+      },
+    });
+
+    return res.json(faults);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to load faults",
+    });
+  }
+});
+
+app.post(
+  "/api/faults/:id/resolve",
+  requireAuth,
+  requireGuideManager,
+  async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id < 1) {
+      return res.status(400).json({
+        message: "Valid fault ID is required",
+      });
+    }
+
+    try {
+      const fault = await prisma.fault.findUnique({ where: { id } });
+
+      if (!fault) {
+        return res.status(404).json({
+          message: "Fault not found",
+        });
+      }
+
+      const faultUpdate = await prisma.fault.updateMany({
+        where: { id, status: "OPEN" },
+        data: { status: "RESOLVED" },
+      });
+
+      if (faultUpdate.count === 0) {
+        return res.status(409).json({
+          message: "This fault is already resolved",
+        });
+      }
+
+      return res.json(await prisma.fault.findUnique({ where: { id } }));
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Unable to resolve fault",
+      });
+    }
+  },
+);
 
 app.put(
   "/api/units/:id",

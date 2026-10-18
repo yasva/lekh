@@ -861,6 +861,7 @@ button:hover {
 
 .loan-actions {
   display: flex;
+  align-items: center;
   gap: 0.75rem;
 }
 
@@ -870,4 +871,14 @@ button:hover {
 
 .fault-form {
   margin-top: 1rem;
+}
+
+.fault-status-open {
+  color: #78350f;
+  background: #fef3c7;
+}
+
+.fault-status-resolved {
+  color: #14532d;
+  background: #dcfce7;
 }

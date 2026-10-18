@@ -15,6 +15,7 @@ import EquipmentForm from "./components/EquipmentForm";
 import MyLoans from "./components/MyLoans";
 import LoanRequests from "./components/LoanRequests";
 import UnitDetails from "./components/UnitDetails";
+import FaultList from "./components/FaultList";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -37,6 +38,7 @@ function App() {
   const [myLoans, setMyLoans] = useState([]);
   const [loanRequests, setLoanRequests] = useState([]);
   const [unitDetails, setUnitDetails] = useState(null);
+  const [faults, setFaults] = useState([]);
 
   useEffect(() => {
     if (!message) {
@@ -550,6 +552,7 @@ function App() {
       setPage("equipment");
       setMyLoans([]);
       setLoanRequests([]);
+      setFaults([]);
       setUnitDetails(null);
       setShowEquipmentForm(false);
       setShowEditEquipmentForm(false);
@@ -731,6 +734,46 @@ function App() {
     }
   }
 
+  async function handleShowFaults() {
+    try {
+      const response = await fetch("/api/faults", {
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return;
+      }
+
+      setFaults(data);
+      setPage("faults");
+      setEquipment(null);
+      setMessage("");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
+  async function handleFaultResolve(faultId) {
+    try {
+      const response = await fetch(`/api/faults/${faultId}/resolve`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      await handleShowFaults();
+
+      setMessage(response.ok ? "Fault marked as resolved." : data.message);
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
   function handleBackToEquipment() {
     setPage("equipment");
     setEquipment(null);
@@ -812,6 +855,18 @@ function App() {
                     Loan requests
                   </button>
                 )}
+
+                {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
+                  <button
+                    className={
+                      page === "faults" ? "nav-link nav-active" : "nav-link"
+                    }
+                    type="button"
+                    onClick={handleShowFaults}
+                  >
+                    Faults
+                  </button>
+                )}
               </nav>
 
               <div className="user-actions desktop-user-actions">
@@ -883,6 +938,19 @@ function App() {
                     </button>
                   )}
 
+                  {(user.role === "MAINTAINER" || user.role === "ADMIN") && (
+                    <button
+                      className="mobile-nav-item"
+                      type="button"
+                      onClick={() => {
+                        handleShowFaults();
+                        setMenuOpen(false);
+                      }}
+                    >
+                      Faults
+                    </button>
+                  )}
+
                   <button
                     className="mobile-logout"
                     type="button"
@@ -907,6 +975,12 @@ function App() {
                 unit={unitDetails}
                 onBack={handleBackFromUnit}
                 onFaultReport={handleFaultReport}
+              />
+            ) : page === "faults" ? (
+              <FaultList
+                faults={faults}
+                onResolve={handleFaultResolve}
+                onUnitSelect={handleUnitSelect}
               />
             ) : page === "loanRequests" ? (
               <LoanRequests
