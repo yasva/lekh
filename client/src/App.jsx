@@ -16,6 +16,8 @@ import MyLoans from "./components/MyLoans";
 import LoanRequests from "./components/LoanRequests";
 import UnitDetails from "./components/UnitDetails";
 import FaultList from "./components/FaultList";
+import ProjectLibrary from "./components/ProjectLibrary";
+import ProjectDetails from "./components/ProjectDetails";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -39,6 +41,8 @@ function App() {
   const [loanRequests, setLoanRequests] = useState([]);
   const [unitDetails, setUnitDetails] = useState(null);
   const [faults, setFaults] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
     if (!message) {
@@ -235,7 +239,7 @@ function App() {
         return false;
       }
 
-      setEquipment(data);
+      setEquipment((current) => ({ ...data, projects: current?.projects }));
 
       setEquipmentList((currentList) =>
         currentList
@@ -575,6 +579,8 @@ function App() {
       setMyLoans([]);
       setLoanRequests([]);
       setFaults([]);
+      setProjects([]);
+      setSelectedProject(null);
       setUnitDetails(null);
       setShowEquipmentForm(false);
       setShowEditEquipmentForm(false);
@@ -795,6 +801,85 @@ function App() {
     }
   }
 
+  async function handleShowProjects() {
+    try {
+      const response = await fetch("/api/projects", {
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return;
+      }
+
+      setProjects(data);
+      setPage("projects");
+      setEquipment(null);
+      setMessage("");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
+  async function handleProjectSelect(projectId) {
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return;
+      }
+
+      setSelectedProject(data);
+      setPage("project");
+      setEquipment(null);
+      setMessage("");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
+  async function handleProjectCreate(projectData) {
+    try {
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(projectData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return false;
+      }
+
+      await handleShowProjects();
+      setMessage("Project saved.");
+      return true;
+    } catch {
+      setMessage("Unable to connect to the server.");
+      return false;
+    }
+  }
+
+  async function handleOpenEquipment(equipmentId) {
+    setPage("equipment");
+    setSelectedProject(null);
+    await handleEquipmentSelect(equipmentId);
+  }
+
   function handleBackToEquipment() {
     setPage("equipment");
     setEquipment(null);
@@ -849,6 +934,18 @@ function App() {
                   onClick={handleBackToEquipment}
                 >
                   Equipment
+                </button>
+
+                <button
+                  className={
+                    page === "projects" || page === "project"
+                      ? "nav-link nav-active"
+                      : "nav-link"
+                  }
+                  type="button"
+                  onClick={handleShowProjects}
+                >
+                  Projects
                 </button>
 
                 {user.role === "STUDENT" && (
@@ -933,6 +1030,17 @@ function App() {
                     Equipment
                   </button>
 
+                  <button
+                    className="mobile-nav-item"
+                    type="button"
+                    onClick={() => {
+                      handleShowProjects();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    Projects
+                  </button>
+
                   {user.role === "STUDENT" && (
                     <button
                       className="mobile-nav-item"
@@ -1003,6 +1111,19 @@ function App() {
                 onResolve={handleFaultResolve}
                 onUnitSelect={handleUnitSelect}
               />
+            ) : page === "projects" ? (
+              <ProjectLibrary
+                projects={projects}
+                equipmentList={equipmentList}
+                onProjectCreate={handleProjectCreate}
+                onProjectSelect={handleProjectSelect}
+              />
+            ) : page === "project" && selectedProject ? (
+              <ProjectDetails
+                project={selectedProject}
+                onBack={handleShowProjects}
+                onEquipmentSelect={handleOpenEquipment}
+              />
             ) : page === "loanRequests" ? (
               <LoanRequests
                 requests={loanRequests}
@@ -1054,6 +1175,7 @@ function App() {
                     onUnitCreate={handleUnitCreate}
                     onUnitUpdate={handleUnitUpdate}
                     onUnitSelect={handleUnitSelect}
+                    onProjectSelect={handleProjectSelect}
                   />
                 )}
               </>

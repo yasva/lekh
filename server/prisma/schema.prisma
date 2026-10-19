@@ -27,6 +27,7 @@ model Equipment {
   troubleshooting   Troubleshooting[]
   loans             Loan[]
   units             EquipmentUnit[]
+  projects          Project[]
 }
 
 enum UnitStatus {
@@ -87,6 +88,7 @@ model User {
   updatedAt    DateTime @updatedAt
   loans        Loan[]
   faults       Fault[]
+  projects     Project[]
 }
 
 enum ApprovalStatus {
@@ -135,4 +137,15 @@ model Fault {
 
   equipmentUnit EquipmentUnit @relation(fields: [equipmentUnitId], references: [id], onDelete: Cascade)
   reporter      User          @relation(fields: [reporterId], references: [id], onDelete: Restrict)
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  authorId    Int
+  createdAt   DateTime @default(now())
+
+  author    User        @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  equipment Equipment[]
 }

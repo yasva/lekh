@@ -109,7 +109,7 @@ const equipmentData = [
 async function main() {
   await prisma.$transaction(async (transaction) => {
     await transaction.$executeRawUnsafe(
-      'TRUNCATE TABLE "Fault", "Loan", "Troubleshooting", "Guide", "EquipmentUnit", "Equipment", "User" RESTART IDENTITY CASCADE',
+      'TRUNCATE TABLE "Project", "Fault", "Loan", "Troubleshooting", "Guide", "EquipmentUnit", "Equipment", "User" RESTART IDENTITY CASCADE',
     );
 
     const passwordHash = await bcrypt.hash(demoPassword, 10);
@@ -160,9 +160,30 @@ async function main() {
 
       console.log(`Created equipment: ${equipment.name}`);
     }
+
+    const student = await transaction.user.findUnique({
+      where: { username: "student" },
+    });
+
+    const projectEquipment = await transaction.equipment.findMany({
+      where: { name: { in: ["Raspberry Pi", "Arduino"] } },
+      select: { id: true },
+    });
+
+    await transaction.project.create({
+      data: {
+        title: "Weather station",
+        description:
+          "Measures temperature and humidity every minute and shows the values on a web page. An Arduino reads the sensor and the Raspberry Pi stores and serves the data.",
+        authorId: student.id,
+        equipment: {
+          connect: projectEquipment,
+        },
+      },
+    });
   });
 
-  const [users, equipment, units, guides, troubleshooting, loans] =
+  const [users, equipment, units, guides, troubleshooting, loans, projects] =
     await Promise.all([
       prisma.user.count(),
       prisma.equipment.count(),
@@ -170,10 +191,11 @@ async function main() {
       prisma.guide.count(),
       prisma.troubleshooting.count(),
       prisma.loan.count(),
+      prisma.project.count(),
     ]);
 
   console.log(
-    `Demo state ready: ${users} users, ${equipment} equipment, ${units} units, ${guides} guides, ${troubleshooting} troubleshooting entries, ${loans} loans.`,
+    `Demo state ready: ${users} users, ${equipment} equipment, ${units} units, ${guides} guides, ${troubleshooting} troubleshooting entries, ${loans} loans, ${projects} projects.`,
   );
 }
 

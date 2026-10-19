@@ -326,7 +326,13 @@ app.get("/api/equipment/:id", requireAuth, async (req, res) => {
   try {
     const equipment = await prisma.equipment.findUnique({
       where: { id },
-      include: unitStatusSelect,
+      include: {
+        ...unitStatusSelect,
+        projects: {
+          select: { id: true, title: true },
+          orderBy: { createdAt: "desc" },
+        },
+      },
     });
 
     if (!equipment) {
@@ -1234,6 +1240,122 @@ app.post("/api/loans/:id/return", requireAuth, async (req, res) => {
     return res.json(loan);
   } catch (error) {
     return sendLoanDecisionError(res, error, "Unable to return loan");
+  }
+});
+
+const MAXIMUM_PROJECT_TITLE_LENGTH = 120;
+const MAXIMUM_PROJECT_DESCRIPTION_LENGTH = 2000;
+
+const projectInclude = {
+  equipment: {
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  },
+};
+
+app.get("/api/projects", requireAuth, async (req, res) => {
+  try {
+    const projects = await prisma.project.findMany({
+      orderBy: { createdAt: "desc" },
+      include: projectInclude,
+    });
+
+    return res.json(projects);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to load projects",
+    });
+  }
+});
+
+app.get("/api/projects/:id", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id < 1) {
+    return res.status(400).json({
+      message: "Valid project ID is required",
+    });
+  }
+
+  try {
+    const project = await prisma.project.findUnique({
+      where: { id },
+      include: projectInclude,
+    });
+
+    if (!project) {
+      return res.status(404).json({
+        message: "Project not found",
+      });
+    }
+
+    return res.json(project);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to load project",
+    });
+  }
+});
+
+app.post("/api/projects", requireAuth, async (req, res) => {
+  const title = typeof req.body.title === "string" ? req.body.title.trim() : "";
+  const description =
+    typeof req.body.description === "string" ? req.body.description.trim() : "";
+  const equipmentIds = Array.isArray(req.body.equipmentIds)
+    ? [...new Set(req.body.equipmentIds.map(Number))]
+    : [];
+
+  if (!title || title.length > MAXIMUM_PROJECT_TITLE_LENGTH) {
+    return res.status(400).json({
+      message: `Give the project a title of 1-${MAXIMUM_PROJECT_TITLE_LENGTH} characters`,
+    });
+  }
+
+  if (!description || description.length > MAXIMUM_PROJECT_DESCRIPTION_LENGTH) {
+    return res.status(400).json({
+      message: `Describe the project in 1-${MAXIMUM_PROJECT_DESCRIPTION_LENGTH} characters`,
+    });
+  }
+
+  if (
+    equipmentIds.length === 0 ||
+    !equipmentIds.every((id) => Number.isInteger(id) && id > 0)
+  ) {
+    return res.status(400).json({
+      message: "Choose at least one piece of equipment",
+    });
+  }
+
+  try {
+    const foundCount = await prisma.equipment.count({
+      where: { id: { in: equipmentIds } },
+    });
+
+    if (foundCount !== equipmentIds.length) {
+      return res.status(400).json({
+        message: "Some of the chosen equipment does not exist",
+      });
+    }
+
+    const project = await prisma.project.create({
+      data: {
+        title,
+        description,
+        authorId: req.session.user.id,
+        equipment: {
+          connect: equipmentIds.map((id) => ({ id })),
+        },
+      },
+      include: projectInclude,
+    });
+
+    return res.status(201).json(project);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to save project",
+    });
   }
 });
 
