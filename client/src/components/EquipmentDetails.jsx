@@ -15,6 +15,7 @@ function EquipmentDetails({
   onUnitCreate,
   onUnitUpdate,
   onUnitSelect,
+  onProjectSelect,
 }) {
   const [setup, setSetup] = useState("");
   const [usage, setUsage] = useState("");
@@ -302,6 +303,36 @@ function EquipmentDetails({
         ) : (
           <div className="guide-card">
             <p>No troubleshooting information available.</p>
+          </div>
+        )}
+      </section>
+
+      <section className="details-section">
+        <h2>Projects using this equipment</h2>
+
+        {equipment.projects?.length > 0 ? (
+          <ul className="loan-list">
+            {equipment.projects.map((project) => (
+              <li className="loan-row" key={project.id}>
+                <div className="loan-main">
+                  <strong>{project.title}</strong>
+                </div>
+
+                <div className="loan-actions">
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={() => onProjectSelect(project.id)}
+                  >
+                    View project
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="guide-card">
+            <p>No projects have used this equipment yet.</p>
           </div>
         )}
       </section>
