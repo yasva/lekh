@@ -53,6 +53,28 @@ function App() {
   }, [message]);
 
   useEffect(() => {
+    if (page !== "myLoans") {
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch("/api/loans/mine", {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          setMyLoans(await response.json());
+        }
+      } catch {
+        // Try again on the next tick.
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [page]);
+
+  useEffect(() => {
     async function checkSession() {
       try {
         const response = await fetch("/api/session", {
@@ -626,7 +648,6 @@ function App() {
         return false;
       }
 
-      // Reload the unit so the new fault shows in the list.
       const unitResponse = await fetch(`/api/units/${unitId}`, {
         credentials: "include",
       });
