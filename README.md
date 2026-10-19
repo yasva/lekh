@@ -26,7 +26,7 @@ when responsible staff or maintainers change.
 
 | Name                  | Characteristics                                                                                                                                                   | Needs and Expectations                                                                                                                                                         | How will they use the system?                                                                                                                                                                     |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Alex – Student        | Student / Equipment User. Internal user with varying levels of technical experience.                                                                              | Find equipment, understand how to use it, access guides and troubleshooting information, check availability, request equipment, return borrowed equipment and report problems. | Logs in, browses or searches for equipment, opens equipment pages, reads guides, checks availability, requests loans, completes the return checklist when returning equipment and reports faults. |
+| Alex – Student        | Student / Equipment User. Internal user with varying levels of technical experience.                                                                              | Find equipment, understand how to use it, access guides and troubleshooting information, check availability, request equipment, return borrowed equipment and report problems. | Logs in, browses or searches for equipment, opens equipment pages, reads guides, checks availability, requests loans, returns borrowed equipment from My loans and reports faults. |
 | Robin – Lab Assistant | Student assistant with Maintainer responsibilities. Generally has more technical knowledge than an ordinary user and may be responsible for particular equipment. | Maintain equipment information and guides, manage equipment condition, faults and relevant loan requests.                                                                      | Updates equipment and guides, handles reported faults, updates equipment status and processes relevant loan requests.                                                                             |
 | Sam – Administrator   | Administrator with responsibility for administration and access control.                                                                                          | Manage users, roles, permissions, equipment configuration and maintainer responsibilities.                                                                                     | Manages roles and permissions, assigns maintainers and manages equipment-related access rules.                                                                                                    |
 
@@ -53,8 +53,9 @@ when responsible staff or maintainers change.
 - Authorized users shall be able to approve or reject loan requests when
   approval is required.
 - The system shall keep track of active loans and equipment availability.
-- Students/Users shall be able to complete a return checklist and register
-  borrowed equipment as returned.
+- Students/Users shall be able to register borrowed equipment as returned.
+  (Changed after customer meeting 2: the return checklist was removed;
+  the borrower returns the loan from My loans.)
 - Users shall be able to report equipment faults.
 - Authorized users shall be able to manage faults and update equipment
   condition.
@@ -171,6 +172,47 @@ Log in with one of the test accounts (password `password123` for all):
 
 New users can create their own Student account on the login page with **Create account**.
 
+### Using LEKH on a phone
+
+The phone and the computer must be on the same Wi-Fi network. The client calls the API through Vite's proxy (`/api` → port 4000), so only the client port needs to be reachable from the phone.
+
+1. Start the client with `npx vite --host` instead of `npm run dev`.
+2. Vite prints a `Network:` address, for example `http://192.168.1.23:5173`.
+3. Open that address in the phone's browser. **Type the full address including `http://`.** Without it, many phone browsers try `https://` and the page does not load.
+
+If the project runs inside WSL2 on Windows, the addresses Vite prints may be internal to Windows and inaccessible from the phone. Forward the port from Windows (PowerShell as administrator) and open the computer's Wi-Fi address from `ipconfig` instead:
+
+```powershell
+netsh interface portproxy add v4tov4 listenport=5173 listenaddress=0.0.0.0 connectport=5173 connectaddress=<WSL address from: hostname -I>
+New-NetFirewallRule -DisplayName "Vite 5173" -Direction Inbound -LocalPort 5173 -Protocol TCP -Action Allow
+```
+
+The WSL address can change after a restart. If the phone stops connecting, delete the portproxy rule and add it again with the new address:
+
+```powershell
+netsh interface portproxy delete v4tov4 listenport=5173 listenaddress=0.0.0.0
+```
+
+Remove the firewall rule afterwards:
+
+```powershell
+Remove-NetFirewallRule -DisplayName "Vite 5173"
+```
+
+### Main workflows
+
+**Student**
+- Browse equipment with its category and availability. Open an equipment page to read its guide and troubleshooting information.
+- Request a loan: choose an available unit, a start date and an end date. The request stays pending until a Maintainer decides.
+- My loans lists your requests and their status, and refreshes while it is open. Return an active loan from here.
+- Report a fault on a specific unit from the unit's page.
+
+**Maintainer / Administrator**
+- Add equipment types and register units, each with its own identifier, location and condition. Set a unit to Out of service to stop it from being borrowed.
+- Add troubleshooting entries to a type. They are shown as known problems on every unit of that type.
+- Loan requests: approve or reject pending requests.
+- Faults: see all reported faults, open faults first, and mark a fault as resolved.
+
 ### Resetting the demo data
 
 ```bash
@@ -178,12 +220,14 @@ cd server
 npm run seed
 ```
 
-**Warning:** this deletes all users, equipment, guides, troubleshooting entries and loans in the database `DATABASE_URL` points to, then recreates the known demo state with the three test accounts. Only run it against your development database.
+**Warning:** this empties the LEKH tables (users, equipment, units, guides, troubleshooting, loans and faults) in the database `DATABASE_URL` points to, then recreates the demo state with the three test accounts. Accounts created with **Create account** are removed. Only run it against your development database.
 
-After a reset, all equipment requires approval, so a loan request stays pending and does not change availability.
+After a reset, all equipment requires approval, so a loan request stays pending until a Maintainer approves it.
 
 ### Known limitations
 
-- Loan approval, rejection, return and active-loan management are not implemented yet; they are planned for Sprint 3. Pending loan requests therefore stay pending.
-- The approval requirement is currently stored per equipment item, but there is not yet a user interface for Maintainers/Administrators to configure `approvalRequired`.
-- New accounts always get the Student role. There is no user interface for changing roles; the Maintainer and Administrator test accounts are created by the seed.
+- An approved loan with a future start date marks the unit as on loan immediately.
+- Resolving a fault does not change the unit's condition or status; a Maintainer updates the unit separately.
+- Only the borrower can return a loan. There is no staff overview of all active loans.
+- New accounts always get the Student role. There is no user interface for changing roles or giving a user more than one role; the Maintainer and Administrator accounts are created by the seed.
+- Guide version history, QR codes, the project library and search across equipment, guides and projects (acceptance tests 12–13) are not built.
