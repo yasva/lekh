@@ -1269,7 +1269,7 @@ function App() {
 
                 <div className="equipment-controls">
                   <div className="equipment-search">
-                    <label htmlFor="equipment-search">Search equipment</label>
+                    <label htmlFor="equipment-search">Filter equipment</label>
                     <input
                       id="equipment-search"
                       type="search"
@@ -1277,7 +1277,7 @@ function App() {
                       onChange={(event) =>
                         setEquipmentSearch(event.target.value)
                       }
-                      placeholder="Search by name, model or category"
+                      placeholder="Filter by name, model or category"
                     />
                   </div>
 
