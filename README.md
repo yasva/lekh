@@ -24,11 +24,11 @@ when responsible staff or maintainers change.
 
 ### User Personas
 
-| Name                  | Characteristics                                                                                                                                                   | Needs and Expectations                                                                                                                                                         | How will they use the system?                                                                                                                                                                     |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Name                  | Characteristics                                                                                                                                                   | Needs and Expectations                                                                                                                                                         | How will they use the system?                                                                                                                                                      |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Alex – Student        | Student / Equipment User. Internal user with varying levels of technical experience.                                                                              | Find equipment, understand how to use it, access guides and troubleshooting information, check availability, request equipment, return borrowed equipment and report problems. | Logs in, browses or searches for equipment, opens equipment pages, reads guides, checks availability, requests loans, returns borrowed equipment from My loans and reports faults. |
-| Robin – Lab Assistant | Student assistant with Maintainer responsibilities. Generally has more technical knowledge than an ordinary user and may be responsible for particular equipment. | Maintain equipment information and guides, manage equipment condition, faults and relevant loan requests.                                                                      | Updates equipment and guides, handles reported faults, updates equipment status and processes relevant loan requests.                                                                             |
-| Sam – Administrator   | Administrator with responsibility for administration and access control.                                                                                          | Manage users, roles, permissions, equipment configuration and maintainer responsibilities.                                                                                     | Manages roles and permissions, assigns maintainers and manages equipment-related access rules.                                                                                                    |
+| Robin – Lab Assistant | Student assistant with Maintainer responsibilities. Generally has more technical knowledge than an ordinary user and may be responsible for particular equipment. | Maintain equipment information and guides, manage equipment condition, faults and relevant loan requests.                                                                      | Updates equipment and guides, handles reported faults, updates equipment status and processes relevant loan requests.                                                              |
+| Sam – Administrator   | Administrator with responsibility for administration and access control.                                                                                          | Manage users, roles, permissions, equipment configuration and maintainer responsibilities.                                                                                     | Manages roles and permissions, assigns maintainers and manages equipment-related access rules.                                                                                     |
 
 ### Software Requirements
 
@@ -54,8 +54,9 @@ when responsible staff or maintainers change.
   approval is required.
 - The system shall keep track of active loans and equipment availability.
 - Students/Users shall be able to register borrowed equipment as returned.
-  (Changed after customer meeting 2: the return checklist was removed;
-  the borrower returns the loan from My loans.)
+  (The return checklist confirmed at customer meeting 2 was not built in
+  Sprint 3; acceptance test 10 does not require it. The borrower returns
+  the loan from My loans.)
 - Users shall be able to report equipment faults.
 - Authorized users shall be able to manage faults and update equipment
   condition.
@@ -78,40 +79,20 @@ when responsible staff or maintainers change.
 
 ---
 
-## Your Backlog
+## Backlog
 
-Your backlog lives in two places, working together:
-
-### 1. GitHub Issues (the content)
-
-For every user story, feature and task, create a GitHub Issue with a clear title and description. Use the issue template provided in this repository (see `.github/ISSUE_TEMPLATE/`).
-
-Write them in this order:
-
-1. All **user stories** first (format: _"As [a user], I want [action] so that [goal]"_)
-2. Then all **features**
-3. Then all **tasks**
-
-### 2. Project Board (the backlog itself)
-
-Add every Issue to a Project board. The board is your backlog, not the issue text.
-
-Your repository does not come with a board already set up — see **[PROJECT_BOARD.md](PROJECT_BOARD.md)** for step-by-step instructions on creating your board and setting up the required fields (Priority, Estimated Effort, Sprint).
-
-You'll need a working board by the end of Sprint 1, as Status Report 3 requires it.
+The backlog is the [Agile Board](https://github.com/orgs/dipt-pa1493-ht26/projects/24) (Priority, Estimated Effort, Sprint) together with the GitHub Issues it lists: user stories, features and tasks, linked with "Supports #N" and "Part of #N".
 
 ---
 
 ## Development
 
-From Week 38 onward:
+- `client/` – React with Vite. The dev server proxies `/api` to the server on port 4000.
+- `server/` – Express 5 with sessions, Prisma 7 and PostgreSQL. The schema and migrations are in `server/prisma/`.
+- `docs/requirements.md` – requirements specification and acceptance-test traceability.
+- `docs/definition-of-done.md` – Definition of Done for backlog items.
 
-- Set up your development environment and start development.
-- You're free to organise your code however works best for you — for example, using `src/` and `docs/` folders, or any other structure. There's no required folder layout;
-- At the end of each sprint, your work will be demonstrated to the customer at that sprint's Demo
-- Keep this README as the one place that always explains how to install and run your project.
-
-Your repository must remain **Private** for the entire course. This protects your customer's requirements and your own work.
+Each backlog item is developed on its own branch and merged to `main` through a pull request that closes the issue.
 
 ---
 
@@ -202,6 +183,7 @@ Remove-NetFirewallRule -DisplayName "Vite 5173"
 ### Main workflows
 
 **Student**
+
 - Browse equipment with its category and availability. Open an equipment page to read its guide and troubleshooting information.
 - Request a loan: choose an available unit, a start date and an end date. The request stays pending until a Maintainer decides.
 - My loans lists your requests and their status, and refreshes while it is open. Return an active loan from here.
@@ -210,6 +192,7 @@ Remove-NetFirewallRule -DisplayName "Vite 5173"
 - Search: search equipment, guides and projects at once and open any result.
 
 **Maintainer / Administrator**
+
 - Add equipment types and register units, each with its own identifier, location and condition. Set a unit to Out of service to stop it from being borrowed.
 - Add troubleshooting entries to a type. They are shown as known problems on every unit of that type.
 - Loan requests: approve or reject pending requests.
@@ -222,7 +205,7 @@ cd server
 npm run seed
 ```
 
-**Warning:** this empties the LEKH tables (users, equipment, units, guides, troubleshooting, loans and faults) in the database `DATABASE_URL` points to, then recreates the demo state with the three test accounts. Accounts created with **Create account** are removed. Only run it against your development database.
+**Warning:** this empties the LEKH tables (users, equipment, units, guides, troubleshooting, loans, faults and projects) in the database `DATABASE_URL` points to, then recreates the demo state with the three test accounts. Accounts created with **Create account** are removed. Only run it against your development database.
 
 After a reset, all equipment requires approval, so a loan request stays pending until a Maintainer approves it.
 
@@ -233,3 +216,7 @@ After a reset, all equipment requires approval, so a loan request stays pending 
 - Only the borrower can return a loan. There is no staff overview of all active loans.
 - New accounts always get the Student role. There is no user interface for changing roles or giving a user more than one role; the Maintainer and Administrator accounts are created by the seed.
 - Guide version history and QR codes are not built. Projects cannot be edited or deleted.
+- The interface has a dark theme only; Light and Auto modes are not implemented (#152).
+- Category is matched by the Filter box; there is no separate category dropdown (#152).
+- Resolving a fault records no resolution note (#145).
+- The return checklist (FR-22) is not built; returns are one step from My loans (#152).
