@@ -907,3 +907,7 @@ button:hover {
   width: auto;
   padding: 0;
 }
+
+.search-form {
+  margin-bottom: 1.5rem;
+}

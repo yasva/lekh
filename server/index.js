@@ -1359,6 +1359,95 @@ app.post("/api/projects", requireAuth, async (req, res) => {
   }
 });
 
+const MINIMUM_SEARCH_LENGTH = 2;
+const SEARCH_RESULT_LIMIT = 20;
+
+function makeSnippet(text, term) {
+  const index = text.toLowerCase().indexOf(term.toLowerCase());
+
+  if (index === -1) {
+    return text.slice(0, 120);
+  }
+
+  const start = Math.max(0, index - 50);
+  const end = Math.min(text.length, index + term.length + 70);
+
+  return `${start > 0 ? "…" : ""}${text.slice(start, end)}${end < text.length ? "…" : ""}`;
+}
+
+app.get("/api/search", requireAuth, async (req, res) => {
+  const term = typeof req.query.q === "string" ? req.query.q.trim() : "";
+
+  if (term.length < MINIMUM_SEARCH_LENGTH) {
+    return res.status(400).json({
+      message: `Search for at least ${MINIMUM_SEARCH_LENGTH} characters`,
+    });
+  }
+
+  const contains = { contains: term, mode: "insensitive" };
+
+  try {
+    const [equipment, guides, projects] = await Promise.all([
+      prisma.equipment.findMany({
+        where: {
+          OR: [
+            { name: contains },
+            { typeModel: contains },
+            { category: contains },
+          ],
+        },
+        select: { id: true, name: true, typeModel: true, category: true },
+        orderBy: { name: "asc" },
+        take: SEARCH_RESULT_LIMIT,
+      }),
+      prisma.guide.findMany({
+        where: {
+          OR: [{ setup: contains }, { usage: contains }],
+        },
+        include: {
+          equipment: {
+            select: { id: true, name: true },
+          },
+        },
+        take: SEARCH_RESULT_LIMIT,
+      }),
+      prisma.project.findMany({
+        where: {
+          OR: [{ title: contains }, { description: contains }],
+        },
+        select: { id: true, title: true, description: true },
+        orderBy: { createdAt: "desc" },
+        take: SEARCH_RESULT_LIMIT,
+      }),
+    ]);
+
+    return res.json({
+      equipment,
+      guides: guides.map((guide) => {
+        const text = `${guide.setup} ${guide.usage}`;
+
+        return {
+          id: guide.id,
+          equipmentId: guide.equipment.id,
+          equipmentName: guide.equipment.name,
+          snippet: makeSnippet(text, term),
+        };
+      }),
+      projects: projects.map((project) => ({
+        id: project.id,
+        title: project.title,
+        snippet: makeSnippet(project.description, term),
+      })),
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to search",
+    });
+  }
+});
+
 app.post("/api/logout", (req, res) => {
   req.session.destroy((error) => {
     if (error) {

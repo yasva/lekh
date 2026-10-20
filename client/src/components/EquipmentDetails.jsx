@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import UnitList from "./UnitList";
 
 function EquipmentDetails({
@@ -16,6 +16,8 @@ function EquipmentDetails({
   onUnitUpdate,
   onUnitSelect,
   onProjectSelect,
+  focusGuide,
+  onGuideFocused,
 }) {
   const [setup, setSetup] = useState("");
   const [usage, setUsage] = useState("");
@@ -29,6 +31,18 @@ function EquipmentDetails({
   const [loanStartDate, setLoanStartDate] = useState("");
   const [loanEndDate, setLoanEndDate] = useState("");
   const [loanUnitId, setLoanUnitId] = useState("");
+
+  useEffect(() => {
+    if (!focusGuide) {
+      return;
+    }
+
+    guideSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+    onGuideFocused();
+  }, [focusGuide, onGuideFocused]);
 
   const availableUnits = units.filter((unit) => unit.status === "AVAILABLE");
   const selectedUnit = availableUnits.find(
