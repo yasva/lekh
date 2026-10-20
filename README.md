@@ -207,6 +207,7 @@ Remove-NetFirewallRule -DisplayName "Vite 5173"
 - My loans lists your requests and their status, and refreshes while it is open. Return an active loan from here.
 - Report a fault on a specific unit from the unit's page.
 - Projects: record a finished project and the equipment it used. Each equipment page lists the projects that used it.
+- Search: search equipment, guides and projects at once and open any result.
 
 **Maintainer / Administrator**
 - Add equipment types and register units, each with its own identifier, location and condition. Set a unit to Out of service to stop it from being borrowed.
@@ -231,4 +232,4 @@ After a reset, all equipment requires approval, so a loan request stays pending 
 - Resolving a fault does not change the unit's condition or status; a Maintainer updates the unit separately.
 - Only the borrower can return a loan. There is no staff overview of all active loans.
 - New accounts always get the Student role. There is no user interface for changing roles or giving a user more than one role; the Maintainer and Administrator accounts are created by the seed.
-- Guide version history, QR codes and search across equipment, guides and projects (acceptance test 13) are not built. Projects cannot be edited or deleted.
+- Guide version history and QR codes are not built. Projects cannot be edited or deleted.

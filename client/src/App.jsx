@@ -18,6 +18,7 @@ import UnitDetails from "./components/UnitDetails";
 import FaultList from "./components/FaultList";
 import ProjectLibrary from "./components/ProjectLibrary";
 import ProjectDetails from "./components/ProjectDetails";
+import SearchPage from "./components/SearchPage";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -43,6 +44,8 @@ function App() {
   const [faults, setFaults] = useState([]);
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [searchResults, setSearchResults] = useState(null);
+  const [focusGuide, setFocusGuide] = useState(false);
 
   useEffect(() => {
     if (!message) {
@@ -581,6 +584,7 @@ function App() {
       setFaults([]);
       setProjects([]);
       setSelectedProject(null);
+      setSearchResults(null);
       setUnitDetails(null);
       setShowEquipmentForm(false);
       setShowEditEquipmentForm(false);
@@ -874,10 +878,44 @@ function App() {
     }
   }
 
+  function handleShowSearch() {
+    setPage("search");
+    setEquipment(null);
+    setMessage("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function handleSearch(term) {
+    try {
+      const response = await fetch(
+        `/api/search?q=${encodeURIComponent(term.trim())}`,
+        {
+          credentials: "include",
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message);
+        return;
+      }
+
+      setSearchResults({ term: term.trim(), ...data });
+    } catch {
+      setMessage("Unable to connect to the server.");
+    }
+  }
+
   async function handleOpenEquipment(equipmentId) {
     setPage("equipment");
     setSelectedProject(null);
     await handleEquipmentSelect(equipmentId);
+  }
+
+  async function handleOpenGuide(equipmentId) {
+    await handleOpenEquipment(equipmentId);
+    setFocusGuide(true);
   }
 
   function handleBackToEquipment() {
@@ -946,6 +984,16 @@ function App() {
                   onClick={handleShowProjects}
                 >
                   Projects
+                </button>
+
+                <button
+                  className={
+                    page === "search" ? "nav-link nav-active" : "nav-link"
+                  }
+                  type="button"
+                  onClick={handleShowSearch}
+                >
+                  Search
                 </button>
 
                 {user.role === "STUDENT" && (
@@ -1041,6 +1089,17 @@ function App() {
                     Projects
                   </button>
 
+                  <button
+                    className="mobile-nav-item"
+                    type="button"
+                    onClick={() => {
+                      handleShowSearch();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    Search
+                  </button>
+
                   {user.role === "STUDENT" && (
                     <button
                       className="mobile-nav-item"
@@ -1111,6 +1170,14 @@ function App() {
                 onResolve={handleFaultResolve}
                 onUnitSelect={handleUnitSelect}
               />
+            ) : page === "search" ? (
+              <SearchPage
+                results={searchResults}
+                onSearch={handleSearch}
+                onEquipmentSelect={handleOpenEquipment}
+                onGuideSelect={handleOpenGuide}
+                onProjectSelect={handleProjectSelect}
+              />
             ) : page === "projects" ? (
               <ProjectLibrary
                 projects={projects}
@@ -1176,6 +1243,8 @@ function App() {
                     onUnitUpdate={handleUnitUpdate}
                     onUnitSelect={handleUnitSelect}
                     onProjectSelect={handleProjectSelect}
+                    focusGuide={focusGuide}
+                    onGuideFocused={() => setFocusGuide(false)}
                   />
                 )}
               </>
