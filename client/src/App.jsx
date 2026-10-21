@@ -682,11 +682,13 @@ function App() {
     await handleEquipmentSelect(equipmentId);
   }
 
-  async function handleLoanReturn(loanId) {
+  async function handleLoanReturn(loanId, checklist) {
     try {
       const response = await fetch(`/api/loans/${loanId}/return`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
+        body: JSON.stringify(checklist),
       });
 
       const data = await response.json();
@@ -706,8 +708,12 @@ function App() {
           ? "Loan returned. The unit is available again."
           : data.message,
       );
+
+      return response.ok;
     } catch {
       setMessage("Unable to connect to the server.");
+
+      return false;
     }
   }
 

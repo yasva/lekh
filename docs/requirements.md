@@ -5,7 +5,7 @@
 **Customer:** Zeth Danielsson  
 **Course:** PA1493 Software Development Project (Distance) HT26  
 **Status:** Final for Sprint 3  
-**Version:** 0.6
+**Version:** 0.7
 **Last updated:** 2026-10-21
 
 ## Document History
@@ -18,6 +18,7 @@
 | 0.4     | 2026-10-12 | Sprint 3 acceptance tests and backlog refinement  | Added Sprint 3 implementation scope, acceptance-test traceability and deferred implementation notes without changing customer-confirmed requirements |
 | 0.5     | 2026-10-20 | Sprint 3 acceptance test run (#129)               | Recorded Sprint 3 outcome and remaining gaps                                                                                                         |
 | 0.6     | 2026-10-21 | Demo 3                                            | Recorded Demo 3 outcome; separated items deferred in the Sprint 3 commitment from items not delivered                                                |
+| 0.7     | 2026-10-21 | Return checklist (#155)                           | Implemented the return checklist (FR-22) requested again at Demo 3                                                                                   |
 
 ## Requirement Status
 
@@ -524,7 +525,7 @@ After the return is registered, the equipment availability shall be updated appr
 
 A separate Maintainer inspection or pending-inspection state is not required before the equipment can be returned to availability.
 
-**Sprint 3 note:** the checklist/information step was deferred in the Sprint 3 commitment because acceptance test 10 does not require it. The borrower returns an active loan in one step from My loans; the loan keeps its return date and appears in the unit's loan history. The customer confirmed at Demo 3 that the checklist is still wanted (#155).
+**Implementation note:** implemented after Demo 3 (#155). The borrower confirms that all parts are returned and that the equipment is undamaged and adds a comment if not. The answers are stored with the loan and shown in the unit's loan history.
 
 ---
 
@@ -1071,7 +1072,6 @@ All items in the Sprint 3 core commitment were delivered, as well as both stretc
 
 Deferred in the Sprint 3 commitment and not built:
 
-- The return checklist (FR-22); see 6.4 and #155.
 - Role administration, guide version history and QR codes (see 6.1).
 
 Described in this specification or the backlog but not delivered:
@@ -1084,6 +1084,8 @@ Testing was manual, partly assisted by scripted browser runs outside the reposit
 ## 6.4 Demo 3 (21 October 2026)
 
 All 13 acceptance tests were demonstrated and the customer accepted the product. The customer confirmed that the return checklist (FR-22) is still wanted; it is recorded as #155 for further development.
+
+The return checklist was implemented after the demo (#155).
 
 # 7. Current Requirements Summary
 

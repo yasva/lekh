@@ -149,6 +149,14 @@ function UnitDetails({ unit, onBack, onFaultReport }) {
                     {loan.returnedAt && (
                       <span>Returned {formatDate(loan.returnedAt)}</span>
                     )}
+                    {loan.returnAllParts !== null && (
+                      <span>
+                        Checklist:{" "}
+                        {loan.returnAllParts ? "all parts" : "parts missing"},{" "}
+                        {loan.returnUndamaged ? "undamaged" : "damaged"}
+                        {loan.returnComment && ` – ${loan.returnComment}`}
+                      </span>
+                    )}
                   </div>
 
                   <span
