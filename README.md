@@ -53,7 +53,7 @@ when responsible staff or maintainers change.
 - Authorized users shall be able to approve or reject loan requests when
   approval is required.
 - The system shall keep track of active loans and equipment availability.
-- Students/Users shall be able to register borrowed equipment as returned. The borrower returns the loan from My loans.
+- Students/Users shall be able to register borrowed equipment as returned. The borrower completes a return checklist in My loans.
 - Users shall be able to report equipment faults.
 - Authorized users shall be able to manage faults and update equipment
   condition.
@@ -181,6 +181,8 @@ Remove-NetFirewallRule -DisplayName "Vite 5173"
 
 ### Main workflows
 
+Choose Light, Dark or Auto with the theme buttons in the header (in the menu on a phone or narrow window). Auto follows the device setting and the choice is remembered in the browser.
+
 **Student**
 
 - Browse equipment with its category and availability. Open an equipment page to read its guide and troubleshooting information.
@@ -215,6 +217,5 @@ After a reset, all equipment requires approval, so a loan request stays pending 
 - Only the borrower can return a loan. There is no staff overview of all active loans.
 - New accounts always get the Student role. There is no user interface for changing roles or giving a user more than one role; the Maintainer and Administrator accounts are created by the seed.
 - Guide version history and QR codes are not built. Projects cannot be edited or deleted.
-- The interface has a dark theme only; Light and Auto modes are not implemented (#152).
 - Category is matched by the Filter box; there is no separate category dropdown (#152).
 - Resolving a fault records no resolution note (#145).

@@ -39,6 +39,25 @@
   color-scheme: dark;
 }
 
+/* Light theme, chosen with the theme switcher (Light or Auto) */
+:root[data-theme="light"] {
+  --color-gray-3: hsl(224, 8%, 40%);
+  --color-gray-4: hsl(224, 12%, 80%);
+  --color-gray-5: hsl(224, 14%, 88%);
+
+  --color-accent: hsl(224, 85%, 48%);
+  --color-accent-hover: hsl(224, 85%, 40%);
+
+  --color-background: hsl(224, 20%, 96%);
+  --color-surface: var(--color-white);
+  --color-border: var(--color-gray-5);
+
+  --color-text: hsl(224, 12%, 28%);
+  --color-heading: hsl(224, 14%, 14%);
+
+  color-scheme: light;
+}
+
 * {
   box-sizing: border-box;
 }

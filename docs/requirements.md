@@ -5,8 +5,8 @@
 **Customer:** Zeth Danielsson  
 **Course:** PA1493 Software Development Project (Distance) HT26  
 **Status:** Final for Sprint 3  
-**Version:** 0.7
-**Last updated:** 2026-10-21
+**Version:** 0.8
+**Last updated:** 2026-10-22
 
 ## Document History
 
@@ -19,6 +19,7 @@
 | 0.5     | 2026-10-20 | Sprint 3 acceptance test run (#129)               | Recorded Sprint 3 outcome and remaining gaps                                                                                                         |
 | 0.6     | 2026-10-21 | Demo 3                                            | Recorded Demo 3 outcome; separated items deferred in the Sprint 3 commitment from items not delivered                                                |
 | 0.7     | 2026-10-21 | Return checklist (#155)                           | Implemented the return checklist (FR-22) requested again at Demo 3                                                                                   |
+| 0.8     | 2026-10-22 | Themes (#158)                                     | Implemented Dark, Light and Auto themes after Demo 3                                                                                                 |
 
 ## Requirement Status
 
@@ -1076,7 +1077,6 @@ Deferred in the Sprint 3 commitment and not built:
 
 Described in this specification or the backlog but not delivered:
 
-- Dark, Light and Auto themes (6.2, #128): the application has a dark theme only (#152).
 - A separate category filter: category is matched by the text filter (#127, #152).
 
 Testing was manual, partly assisted by scripted browser runs outside the repository; the repository contains no automated test suite.
@@ -1086,6 +1086,7 @@ Testing was manual, partly assisted by scripted browser runs outside the reposit
 All 13 acceptance tests were demonstrated and the customer accepted the product. The customer confirmed that the return checklist (FR-22) is still wanted; it is recorded as #155 for further development.
 
 The return checklist was implemented after the demo (#155).
+Dark, Light and Auto themes were implemented after the demo (#158).
 
 # 7. Current Requirements Summary
 
