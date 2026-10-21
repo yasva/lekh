@@ -5,6 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>client</title>
+    <script>
+      // Set the saved theme before the page is drawn, so it does not flash.
+      try {
+        const saved = localStorage.getItem("lekh-theme");
+        const theme = ["light", "dark", "auto"].includes(saved)
+          ? saved
+          : "dark";
+        const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.dataset.theme =
+          theme === "auto" ? (prefersDark ? "dark" : "light") : theme;
+      } catch {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -19,8 +19,11 @@ import FaultList from "./components/FaultList";
 import ProjectLibrary from "./components/ProjectLibrary";
 import ProjectDetails from "./components/ProjectDetails";
 import SearchPage from "./components/SearchPage";
+import ThemeSwitcher from "./components/ThemeSwitcher";
+import { useTheme } from "./hooks/useTheme";
 
 function App() {
+  const [theme, setTheme] = useTheme();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -1042,6 +1045,7 @@ function App() {
               </nav>
 
               <div className="user-actions desktop-user-actions">
+                <ThemeSwitcher theme={theme} onThemeChange={setTheme} />
                 <span className="current-user">{user.username}</span>
 
                 <button
@@ -1071,6 +1075,11 @@ function App() {
                   <div className="mobile-user">
                     <span className="mobile-user-label">Signed in as</span>
                     <strong>{user.username}</strong>
+                  </div>
+
+                  <div className="mobile-theme">
+                    <span className="mobile-user-label">Theme</span>
+                    <ThemeSwitcher theme={theme} onThemeChange={setTheme} />
                   </div>
 
                   <button

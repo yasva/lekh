@@ -269,7 +269,7 @@
 }
 
 .back-button:hover {
-  color: var(--color-white);
+  color: var(--color-heading);
   background: transparent;
 }
 
@@ -516,7 +516,8 @@ button:hover {
 
 /* ---------- Responsive ---------- */
 
-@media (max-width: 700px) {
+/* The header switches to the menu button before the navigation runs out of room. */
+@media (max-width: 960px) {
   .header-content {
     min-height: 60px;
     padding: 0 1rem;
@@ -586,7 +587,9 @@ button:hover {
   .mobile-logout:hover {
     background: var(--color-gray-5);
   }
+}
 
+@media (max-width: 700px) {
   .app-content {
     padding: 2rem 1rem;
   }
@@ -958,4 +961,44 @@ button:hover {
 
 .search-form {
   margin-bottom: 1.5rem;
+}
+
+/* ---------- Theme switcher ---------- */
+
+.theme-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem;
+
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.theme-switcher .theme-option {
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+
+  color: var(--color-gray-3);
+  background: transparent;
+  border-radius: 6px;
+}
+
+.theme-switcher .theme-option:hover {
+  color: var(--color-heading);
+  background: var(--color-gray-5);
+}
+
+.theme-switcher .theme-option.theme-active {
+  color: var(--color-white);
+  background: var(--color-accent);
+}
+
+.mobile-theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem;
 }
