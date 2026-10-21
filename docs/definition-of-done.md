@@ -19,7 +19,7 @@ A backlog item (task, feature or story) is Done when all of the following hold.
 
 - The README User Manual and Known limitations match the delivered behaviour.
 - The issue is closed with a comment on what was delivered and anything left out and the board status is Done.
-- Actual time is recorded in the time log.
+- Actual time is recorded per issue and reported in the sprint status report.
 
 ## Sprint
 

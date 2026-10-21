@@ -4,9 +4,9 @@
 
 **Customer:** Zeth Danielsson  
 **Course:** PA1493 Software Development Project (Distance) HT26  
-**Status:** Draft  
-**Version:** 0.5
-**Last updated:** 2026-10-20
+**Status:** Final for Sprint 3  
+**Version:** 0.6
+**Last updated:** 2026-10-21
 
 ## Document History
 
@@ -16,7 +16,8 @@
 | 0.2     | 2026-09-11 | Customer Meeting 2                                | Updated requirements, priorities, permissions, return workflow, equipment quantity model, guide version history and mobile requirements              |
 | 0.3     | 2026-09-21 | Customer Meeting 2 review and Sprint 1 refinement | Clarified equipment type vs physical unit modelling, multi-role responsibilities, knowledge/troubleshooting scope and remaining open questions       |
 | 0.4     | 2026-10-12 | Sprint 3 acceptance tests and backlog refinement  | Added Sprint 3 implementation scope, acceptance-test traceability and deferred implementation notes without changing customer-confirmed requirements |
-| 0.5     | 2026-10-20 | Sprint 3 acceptance test run (#129)               | Recorded Sprint 3 outcome, return workflow change and remaining gaps                                                                                 |
+| 0.5     | 2026-10-20 | Sprint 3 acceptance test run (#129)               | Recorded Sprint 3 outcome and remaining gaps                                                                                                         |
+| 0.6     | 2026-10-21 | Demo 3                                            | Recorded Demo 3 outcome; separated items deferred in the Sprint 3 commitment from items not delivered                                                |
 
 ## Requirement Status
 
@@ -523,7 +524,7 @@ After the return is registered, the equipment availability shall be updated appr
 
 A separate Maintainer inspection or pending-inspection state is not required before the equipment can be returned to availability.
 
-**Sprint 3 note:** the checklist/information step was not implemented in Sprint 3 because acceptance test 10 does not require it. The borrower returns an active loan in one step from My loans; the loan keeps its return date and appears in the unit's loan history. The requirement remains open and will be confirmed with the customer.
+**Sprint 3 note:** the checklist/information step was deferred in the Sprint 3 commitment because acceptance test 10 does not require it. The borrower returns an active loan in one step from My loans; the loan keeps its return date and appears in the unit's loan history. The customer confirmed at Demo 3 that the checklist is still wanted (#155).
 
 ---
 
@@ -1066,13 +1067,23 @@ Test results shall be recorded as PASS, PARTIAL or FAIL. Identified defects shal
 
 All 13 acceptance tests passed on main @ 9097937 from a fresh install and an empty database; results are recorded in #129.
 
-Not met from the Sprint 3 commitment:
+All items in the Sprint 3 core commitment were delivered, as well as both stretch goals (#130–#133).
 
-- The return checklist (FR-22) was not implemented (#152).
-- Dark, Light and Auto themes were not verified; the application has a dark theme only (#152).
-- Category filtering uses the text filter; there is no separate category dropdown (#127, #152).
+Deferred in the Sprint 3 commitment and not built:
 
-Testing was manual and with scripted browser runs; the repository contains no automated test suite.
+- The return checklist (FR-22); see 6.4 and #155.
+- Role administration, guide version history and QR codes (see 6.1).
+
+Described in this specification or the backlog but not delivered:
+
+- Dark, Light and Auto themes (6.2, #128): the application has a dark theme only (#152).
+- A separate category filter: category is matched by the text filter (#127, #152).
+
+Testing was manual, partly assisted by scripted browser runs outside the repository; the repository contains no automated test suite.
+
+## 6.4 Demo 3 (21 October 2026)
+
+All 13 acceptance tests were demonstrated and the customer accepted the product. The customer confirmed that the return checklist (FR-22) is still wanted; it is recorded as #155 for further development.
 
 # 7. Current Requirements Summary
 

@@ -54,8 +54,8 @@ when responsible staff or maintainers change.
   approval is required.
 - The system shall keep track of active loans and equipment availability.
 - Students/Users shall be able to register borrowed equipment as returned.
-  (The return checklist confirmed at customer meeting 2 was not built in
-  Sprint 3; acceptance test 10 does not require it. The borrower returns
+  (The return checklist confirmed at customer meeting 2 was deferred in
+  the Sprint 3 commitment and is not built; see #155. The borrower returns
   the loan from My loans.)
 - Users shall be able to report equipment faults.
 - Authorized users shall be able to manage faults and update equipment
@@ -93,6 +93,8 @@ The backlog is the [Agile Board](https://github.com/orgs/dipt-pa1493-ht26/projec
 - `docs/definition-of-done.md` – Definition of Done for backlog items.
 
 Each backlog item is developed on its own branch and merged to `main` through a pull request that closes the issue.
+
+Sprint 3 status: all 13 customer acceptance tests passed on `main` from a fresh install and an empty database (#129) and the product was accepted at Demo 3 on 21 October 2026. See `docs/requirements.md` §6.3–6.4.
 
 ---
 
@@ -219,4 +221,4 @@ After a reset, all equipment requires approval, so a loan request stays pending 
 - The interface has a dark theme only; Light and Auto modes are not implemented (#152).
 - Category is matched by the Filter box; there is no separate category dropdown (#152).
 - Resolving a fault records no resolution note (#145).
-- The return checklist (FR-22) is not built; returns are one step from My loans (#152).
+- The return checklist (FR-22) was deferred and is not built; returns are one step from My loans. The customer confirmed at Demo 3 that it is still wanted (#155).
