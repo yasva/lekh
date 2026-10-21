@@ -53,10 +53,7 @@ when responsible staff or maintainers change.
 - Authorized users shall be able to approve or reject loan requests when
   approval is required.
 - The system shall keep track of active loans and equipment availability.
-- Students/Users shall be able to register borrowed equipment as returned.
-  (The return checklist confirmed at customer meeting 2 was deferred in
-  the Sprint 3 commitment and is not built; see #155. The borrower returns
-  the loan from My loans.)
+- Students/Users shall be able to register borrowed equipment as returned. The borrower returns the loan from My loans.
 - Users shall be able to report equipment faults.
 - Authorized users shall be able to manage faults and update equipment
   condition.
@@ -188,7 +185,7 @@ Remove-NetFirewallRule -DisplayName "Vite 5173"
 
 - Browse equipment with its category and availability. Open an equipment page to read its guide and troubleshooting information.
 - Request a loan: choose an available unit, a start date and an end date. The request stays pending until a Maintainer decides.
-- My loans lists your requests and their status, and refreshes while it is open. Return an active loan from here.
+- My loans lists your requests and their status and refreshes while it is open. Return an active loan from here by completing the return checklist: all parts returned, equipment undamaged and a comment if anything is missing or damaged.
 - Report a fault on a specific unit from the unit's page.
 - Projects: record a finished project and the equipment it used. Each equipment page lists the projects that used it.
 - Search: search equipment, guides and projects at once and open any result.
@@ -221,4 +218,3 @@ After a reset, all equipment requires approval, so a loan request stays pending 
 - The interface has a dark theme only; Light and Auto modes are not implemented (#152).
 - Category is matched by the Filter box; there is no separate category dropdown (#152).
 - Resolving a fault records no resolution note (#145).
-- The return checklist (FR-22) was deferred and is not built; returns are one step from My loans. The customer confirmed at Demo 3 that it is still wanted (#155).

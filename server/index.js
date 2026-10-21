@@ -696,6 +696,9 @@ app.get("/api/units/:id", requireAuth, async (req, res) => {
             endDate: true,
             loanStatus: true,
             returnedAt: true,
+            returnAllParts: true,
+            returnUndamaged: true,
+            returnComment: true,
             borrower: { select: { username: true } },
           },
         },
@@ -1194,12 +1197,35 @@ app.post(
   },
 );
 
+const MAXIMUM_RETURN_COMMENT_LENGTH = 500;
+
 app.post("/api/loans/:id/return", requireAuth, async (req, res) => {
   const id = Number(req.params.id);
+  const { allPartsReturned, undamaged } = req.body ?? {};
+  const comment =
+    typeof req.body?.comment === "string" ? req.body.comment.trim() : "";
 
   if (!Number.isInteger(id) || id < 1) {
     return res.status(400).json({
       message: "Valid loan ID is required",
+    });
+  }
+
+  if (typeof allPartsReturned !== "boolean" || typeof undamaged !== "boolean") {
+    return res.status(400).json({
+      message: "Complete the return checklist",
+    });
+  }
+
+  if (comment.length > MAXIMUM_RETURN_COMMENT_LENGTH) {
+    return res.status(400).json({
+      message: `The comment can be at most ${MAXIMUM_RETURN_COMMENT_LENGTH} characters`,
+    });
+  }
+
+  if ((!allPartsReturned || !undamaged) && !comment) {
+    return res.status(400).json({
+      message: "Describe what is missing or damaged",
     });
   }
 
@@ -1220,7 +1246,13 @@ app.post("/api/loans/:id/return", requireAuth, async (req, res) => {
 
       const loanUpdate = await transaction.loan.updateMany({
         where: { id, loanStatus: "ACTIVE" },
-        data: { loanStatus: "RETURNED", returnedAt: new Date() },
+        data: {
+          loanStatus: "RETURNED",
+          returnedAt: new Date(),
+          returnAllParts: allPartsReturned,
+          returnUndamaged: undamaged,
+          returnComment: comment || null,
+        },
       });
 
       if (loanUpdate.count === 0) {
