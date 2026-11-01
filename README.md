@@ -135,4 +135,4 @@ The course ended at customer acceptance. I'm continuing the project to make it p
 
 ## License
 
-[MIT](LICENSE)
+Copyright © 2026 Yasaman Vallaee. All rights reserved. The code is published so it can be read and reviewed. Contact me if you want to reuse it.
