@@ -4,6 +4,10 @@ A full-stack web application for finding, borrowing and maintaining laboratory e
 
 **Status:** accepted by the customer at the final demo on 21 October 2026. All 13 customer acceptance tests passed the day before, from a fresh install and an empty database. The return checklist and the light/dark themes were added after the demo.
 
+> Yasaman started with what I had said mattered most rather than what was easiest and had equipment guides in place in the first sprint while most others were still building inventory lists. The finished solution did what I had asked for, project library included, which was the part most people left out.
+>
+> — Zeth Danielsson, customer representative (translated from Swedish)
+
 <img src="docs/screenshots/equipment-list.png" alt="Equipment list with category, location and availability" width="90%">
 
 <p>
@@ -52,7 +56,7 @@ Access is enforced on the server for every route, not only hidden in the interfa
 - **One branch per backlog item**, merged through pull requests that closed the issue. The original issues and pull requests stayed in the course repository, but the merge commits in this history still show each branch name (for example `task/34-user-login`).
 - **A written Definition of Done.** See [docs/definition-of-done.md](docs/definition-of-done.md).
 
-I was the only developer. The customer was the course's customer representative.
+I was the only developer. The customer was Zeth Danielsson, the course's customer representative.
 
 ## Tech stack
 
